@@ -1,5 +1,5 @@
 all:
-	
+	cd sigproc; $(MAKE)
 
 test:
 	cd test; $(MAKE)
