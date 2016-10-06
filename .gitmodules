@@ -1,0 +1,3 @@
+[submodule "sigproc"]
+	path = sigproc
+	url = https://github.com/gillesdegottex/sigproc.git
