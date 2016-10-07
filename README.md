@@ -1,11 +1,13 @@
-Python scripts implementing analysis and synthesis using a pulse model.
+Implementation of pulse model analysis and synthesis.
 
-Basically dedicated to reproduce the vocoder suggested in:
+It is basically the vocoder suggested in:
 G. Degottex, P. Lanchantin, and M. Gales, "A Pulse Model in Log-domain
     for a Uniform Synthesizer," in Proc. 9th Speech Synthesis Workshop
     (SSW9), 2016.
 
-please see the headers of analysis.py and synthesis.py files.
+Please see the headers of analysis.py and synthesis.py files as well as the
+functions documentation for more details.
+
 
 Copyright(C) 2016 Engineering Department, University of Cambridge, UK.
 
