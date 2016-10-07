@@ -180,28 +180,45 @@ def analysis(wav, fs, f0s=None, f0_min=60, f0_max=600,
     return f0s, SPEC, PDD, NM
 
 def plot_features(wav=None, fs=None, f0s=None, SPEC=None, PDD=None, NM=None):
+    tstart = 0.0
+    tend = 1.0
+    nbview = 0
+    if not wav is None: nbview+=1
+    if not f0s is None: nbview+=1
+    if not SPEC is None: nbview+=1
+    if not PDD is None: nbview+=1
+    if not NM is None: nbview+=1
     import matplotlib.pyplot as plt
     plt.ion()
-    f, axs = plt.subplots(5, 1, sharex=True, sharey=False)
+    f, axs = plt.subplots(nbview, 1, sharex=True, sharey=False)
+    if not type(axs) is np.ndarray: axs = np.array([axs])
+    view=0
     if not wav is None:
         times = np.arange(len(wav))/float(fs)
-        axs[0].plot(times, wav, 'k')
-        axs[0].set_ylabel('Waveform\nAmplitude')
-        axs[0].grid()
-        axs[0].set_xlim((0.0, times[-1]))
+        axs[view].plot(times, wav, 'k')
+        axs[view].set_ylabel('Waveform\nAmplitude')
+        axs[view].grid()
+        axs[view].set_xlim((0.0, times[-1]))
+        view+=1
     if not f0s is None:
-        axs[1].plot(f0s[:,0], f0s[:,1], 'k')
-        axs[1].set_ylabel('F0\nFrequency [Hz]')
-        axs[1].grid()
+        tstart = f0s[0,0]
+        tend = f0s[-1,0]
+        axs[view].plot(f0s[:,0], f0s[:,1], 'k')
+        axs[view].set_ylabel('F0\nFrequency [Hz]')
+        axs[view].grid()
+        view+=1
     if not SPEC is None:
-        axs[2].imshow(sp.mag2db(SPEC).T, origin='lower', aspect='auto', interpolation='none', extent=(f0s[0,0], f0s[-1,0], 0, 0.5*fs))
-        axs[2].set_ylabel('Amp. Envelope\nFrequency [Hz]')
+        axs[view].imshow(sp.mag2db(SPEC).T, origin='lower', aspect='auto', interpolation='none', extent=(tstart, tend, 0, 0.5*fs))
+        axs[view].set_ylabel('Amp. Envelope\nFrequency [Hz]')
+        view+=1
     if not PDD is None:
-        axs[3].imshow(PDD.T, origin='lower', aspect='auto', interpolation='none', extent=(f0s[0,0], f0s[-1,0], 0, 0.5*fs), vmin=0.0, vmax=2.0)
-        axs[3].set_ylabel('PDD\nFrequency [Hz]')
+        axs[view].imshow(PDD.T, origin='lower', aspect='auto', interpolation='none', extent=(tstart, tend, 0, 0.5*fs), vmin=0.0, vmax=2.0)
+        axs[view].set_ylabel('PDD\nFrequency [Hz]')
+        view+=1
     if not NM is None:
-        axs[4].imshow(NM.T, origin='lower', aspect='auto', interpolation='none', extent=(f0s[0,0], f0s[-1,0], 0, 0.5*fs), cmap='Greys', vmin=0.0, vmax=1.0)
-        axs[4].set_ylabel('Noise Mask \nFrequency [Hz]')
+        axs[view].imshow(NM.T, origin='lower', aspect='auto', interpolation='none', extent=(tstart, tend, 0, 0.5*fs), cmap='Greys', vmin=0.0, vmax=1.0)
+        axs[view].set_ylabel('Noise Mask \nFrequency [Hz]')
+        view+=1
     axs[-1].set_xlabel('Time [s]')
     from IPython.core.debugger import  Pdb; Pdb().set_trace()
 
