@@ -1,12 +1,15 @@
 .PHONY: build
 
 
-all: build
+all: sigproc/sinusoidal.pyx build
 	
 
-build:
-	cd sigproc; $(MAKE)
+sigproc/sinusoidal.pyx:
+	git submodule update --init
 	
+build: sigproc/sinusoidal.pyx
+	cd sigproc; $(MAKE)
+
 test: build
 	cd test; $(MAKE)
 	
