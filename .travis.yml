@@ -27,17 +27,15 @@ install:
 script:
     - echo "script..."
     - export PACKAGENAME=pulsemodel.zip
-    #- export PACKAGENAMESUBIDR=pulsemodel_$PROJECTGITVERSION
-    - export PACKAGENAMESUBIDR=pulsemodel
     - echo "Packaging sources of " $PACKAGENAME
     - pwd
     - ls
-    - mkdir ../$PACKAGENAMESUBIDR_source_build
-    - cp -r * ../$PACKAGENAMESUBIDR_source_build/
-    - echo $PROJECTGITVERSION > ../$PACKAGENAMESUBIDR_source_build/Version
-    - rm -fr ../$PACKAGENAMESUBIDR_source_build/.git*
-    - mv ../$PACKAGENAMESUBIDR_source_build $PACKAGENAMESUBIDR
-    - zip -r $PACKAGENAME $PACKAGENAMESUBIDR
+    - mkdir ../pulsemodel_source_build
+    - cp -r * ../pulsemodel_source_build/
+    - echo $PROJECTGITVERSION > ../pulsemodel_source_build/Version
+    - rm -fr ../pulsemodel_source_build/.git*
+    - mv ../pulsemodel_source_build pulsemodel
+    - zip -r $PACKAGENAME pulsemodel
     - ls
     - ls -l $PACKAGENAME
 
