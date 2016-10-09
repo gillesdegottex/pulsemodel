@@ -34,6 +34,7 @@ script:
     - ls
     - mkdir ../$PACKAGENAMESUBIDR
     - cp -r * ../$PACKAGENAMESUBIDR
+    - echo $PROJECTGITVERSION > ../$PACKAGENAMESUBIDR/Version
     - rm -fr ../$PACKAGENAMESUBIDR/.git*
     - mv ../$PACKAGENAMESUBIDR .
     - zip -r $PACKAGENAME $PACKAGENAMESUBIDR
