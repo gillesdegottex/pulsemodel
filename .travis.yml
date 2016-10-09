@@ -32,11 +32,11 @@ script:
     - echo "Packaging sources of " $PACKAGENAME
     - pwd
     - ls
-    - mkdir ../$PACKAGENAMESUBIDR
-    - cp -r * ../$PACKAGENAMESUBIDR
-    - echo $PROJECTGITVERSION > ../$PACKAGENAMESUBIDR/Version
-    - rm -fr ../$PACKAGENAMESUBIDR/.git*
-    - mv ../$PACKAGENAMESUBIDR .
+    - mkdir ../$PACKAGENAMESUBIDR_source_build
+    - cp -r * ../$PACKAGENAMESUBIDR_source_build/
+    - echo $PROJECTGITVERSION > ../$PACKAGENAMESUBIDR_source_build/Version
+    - rm -fr ../$PACKAGENAMESUBIDR_source_build/.git*
+    - mv ../$PACKAGENAMESUBIDR_source_build $PACKAGENAMESUBIDR
     - zip -r $PACKAGENAME $PACKAGENAMESUBIDR
     - ls
     - ls -l $PACKAGENAME
