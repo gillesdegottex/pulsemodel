@@ -30,6 +30,7 @@ install:
 script:
     - echo "script..."
     - export PACKAGENAME=pulsemodel_$PROJECTGITVERSION.zip
+    - echo "Packaging sources of " $PACKAGENAME
     - pwd
     - ls
     
@@ -37,7 +38,7 @@ script:
     - cp -r * ../pulsemodel_$PROJECTGITVERSION
     - rm -fr ../pulsemodel_$PROJECTGITVERSION/.git*
     - mv ../pulsemodel_$PROJECTGITVERSION .
-    - zip -r $PACKAGENAME.zip ../pulsemodel_$PROJECTGITVERSION
+    - zip -r $PACKAGENAME pulsemodel_$PROJECTGITVERSION
     - ls
     - ls -l $PACKAGENAME
     #- echo $TRAVIS_TAG
