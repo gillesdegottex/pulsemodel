@@ -1,0 +1,47 @@
+language: pyhton
+
+compiler:
+    - gcc
+
+os:
+    - linux
+
+branches:
+    only:
+        - master
+
+before_install:
+    - echo "before_install..."
+    - git submodule update --init --recursive
+    - git fetch --tags
+    - sleep 1
+    - git checkout $TRAVIS_BRANCH
+    - export PROJECTGITVERSION=`git describe --tags --always |sed 's/^v//'`
+    - echo $PROJECTGITVERSION
+    - echo $TRAVIS_OS_NAME
+    - echo $TRAVIS_COMMIT
+    - echo $TRAVIS_TAG
+    - export TRAVIS_TAG=`git describe --tags --exact-match HEAD 2>/dev/null`
+    - echo $TRAVIS_TAG
+
+install:
+    - echo "install..."
+
+script:
+    - echo "script..."
+    - export PACKAGENAME=dfasma_$PROJECTGITVERSION.zip
+    - cd ..
+    - ls
+    - zip -r $PACKAGENAME.zip pulsemodel
+    - ls -l $PWD/$PACKAGENAME
+    - echo $TRAVIS_TAG
+
+deploy:
+  skip_cleanup: true
+  provider: releases
+  api_key:
+    secure: LbSkGufUPmCIG9oujJYpySQd4VijFbtR3fP1jH/2DiNMWoZufMUS2wjBLmrfKdxar9eVpbykPFuASw1RhdKsWHKpQuws3qTW12MZcW3XtWVEd3zlA+FCJ4thqZG7G71rJpg5YbeZ1ZdmSJjYd51S9juCpay4chRCTuhwc26fvfW+ZrMEw1+Nky591Sgp4SQpjoXM2itPTyyreVOW6wNeNWZqlcdT38EtU3AMZnXMfuPjojtefNnSKBRgqq4lpuJYyYVvcxqwRXwMQRJ+g3hh8za8jbNuettUFhsXbEupBajtFl9X0aWKBqQgHVRRjHSBvYoWOj7mgmpOIFAczw1UQCklS1Kju/LtBpE/DA0VZmCE0ZNaJ2uvk9t8778nBapUaByTOb3HM4skT0jWcvSV+UFdI2j0TJar21NJOKLDDwT9M86ebgkMipn0YuKCwHaKnKovTT3K3+f+jsmhXbshRA1Kzd1LNiJJQVop/sg7HJTkl+vcBg1ZJ1f/XowZB65R2IauEFZXpk2CFtv7DMZbxOodhioEwAmJgMDX6HYmZ1ng+n/0g55O5B5ODEfUOqRDvenXHfSsr2QZ9q73dXdAVpYRArdrr865/V9k9WyGN/gBIOz3csy9279IiTEPXMCGYdMKGEGMHRQYqDfkDpA2vV9DZtHO8qY9znco/lnGiX0=
+  file: $PACKAGENAME
+  on:
+    repo: gillesdegottex/pulsemodel
+    #tags: true
