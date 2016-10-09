@@ -30,10 +30,14 @@ install:
 script:
     - echo "script..."
     - export PACKAGENAME=pulsemodel_$PROJECTGITVERSION.zip
-    - cd ..
     - pwd
     - ls
-    - zip -r $PACKAGENAME.zip pulsemodel
+    
+    - mkdir ../pulsemodel_$PROJECTGITVERSION
+    - cp -r * ../pulsemodel_$PROJECTGITVERSION
+    - rm -fr ../pulsemodel_$PROJECTGITVERSION/.git*
+    - mv ../pulsemodel_$PROJECTGITVERSION .
+    - zip -r $PACKAGENAME.zip ../pulsemodel_$PROJECTGITVERSION
     - ls
     - ls -l $PACKAGENAME
     #- echo $TRAVIS_TAG
