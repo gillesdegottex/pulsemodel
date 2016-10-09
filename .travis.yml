@@ -29,7 +29,7 @@ script:
     - export PACKAGENAME=pulsemodel.zip
     - echo "Packaging sources of " $PACKAGENAME
     - pwd
-    - ls
+    - ls -l
     - mkdir ../pulsemodel_source_build
     - cp -r * ../pulsemodel_source_build/
     - echo $PROJECTGITVERSION > ../pulsemodel_source_build/Version
