@@ -1,4 +1,4 @@
-## Pulse model analysis and synthesis.
+## Pulse model analysis and synthesis
 
 It is basically the vocoder suggested in:
 > G. Degottex, P. Lanchantin, and M. Gales, "A Pulse Model in Log-domain
