@@ -47,3 +47,4 @@ deploy:
   file: $PACKAGENAME
   on:
     repo: gillesdegottex/pulsemodel
+    tags: true
