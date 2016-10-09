@@ -29,12 +29,14 @@ install:
 
 script:
     - echo "script..."
-    - export PACKAGENAME=dfasma_$PROJECTGITVERSION.zip
+    - export PACKAGENAME=pulsemodel_$PROJECTGITVERSION.zip
     - cd ..
+    - pwd
     - ls
     - zip -r $PACKAGENAME.zip pulsemodel
-    - ls -l $PWD/$PACKAGENAME
-    - echo $TRAVIS_TAG
+    - ls
+    - ls -l $PACKAGENAME
+    #- echo $TRAVIS_TAG
 
 deploy:
   skip_cleanup: true
