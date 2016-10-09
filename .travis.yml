@@ -1,12 +1,11 @@
 language: pyhton
-compiler:
-    - gcc
+
 os:
     - linux
 
 branches:
-  only:
-  - master
+    only:
+    - master
 
 before_install:
     - echo "before_install..."
@@ -24,7 +23,8 @@ before_install:
 
 install:
     - echo "install..."
-    script:
+
+script:
     - echo "script..."
     - export PACKAGENAME=pulsemodel_$PROJECTGITVERSION.zip
     - echo "Packaging sources of " $PACKAGENAME
