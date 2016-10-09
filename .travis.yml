@@ -34,6 +34,7 @@ script:
     - cp -r * ../pulsemodel_source_build/
     - echo $PROJECTGITVERSION > ../pulsemodel_source_build/Version
     - rm -fr ../pulsemodel_source_build/.git*
+    - rm -fr ../pulsemodel_source_build/sigproc/.git*
     - mv ../pulsemodel_source_build pulsemodel
     - zip -r $PACKAGENAME pulsemodel
     - ls
