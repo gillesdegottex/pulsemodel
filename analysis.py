@@ -272,7 +272,7 @@ def analysisf(fwav
     if nm_file:
         NM = analysis_nm(wav, fs, f0s, PDD, verbose=verbose)
         # If asked, compress NM
-        if nm_bnbnds:
+        if nm_nbbnds:
             # If asked, compress the noise mask using a number of mel bands
             NM = sp.linbnd2fwbnd(NM, fs, dftlen, nm_nbbnds)
             # Need to force to binary values because we don't use ambiguous values,
