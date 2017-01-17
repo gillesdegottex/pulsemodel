@@ -252,7 +252,7 @@ def analysisf(fwav
     if spec_file:
         SPEC = analysis_spec(wav, fs, f0s, shift=shift, dftlen=dftlen, verbose=verbose)
         if not spec_order is None:
-            SPEC = sp.spec2mcep(SPEC, fs, order=spec_order)
+            SPEC = sp.spec2mcep(SPEC, sp.bark_alpha(fs), order=spec_order)
         if verbose>0: print('    Output Spectrogram size={} in: {}'.format(SPEC.shape, spec_file))
         SPEC.astype(np.float32).tofile(spec_file)
 
