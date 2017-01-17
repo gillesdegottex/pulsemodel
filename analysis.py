@@ -36,7 +36,7 @@ import os
 import numpy as np
 
 import sigproc as sp
-#import sigproc.pystraight
+import sigproc.pystraight
 
 def analysis_f0postproc(wav, fs, f0s, f0_min=60, f0_max=600,
              shift=0.005,        # Usually 5ms
@@ -73,7 +73,7 @@ def analysis_spec(wav, fs, f0s,
     '''
     Estimate the amplitude spectral envelope.
     '''
-    if 0 and sigproc.pystraight.isanalysiseavailable():
+    if sigproc.pystraight.isanalysiseavailable():
         SPEC = sigproc.pystraight.analysis_spec(wav, fs, f0s, shift, dftlen, keeplen=True)
     else:
         # Estimate the sinusoidal parameters at regular intervals in order
