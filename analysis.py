@@ -275,10 +275,6 @@ def analysisf(fwav
         if nm_nbbnds:
             # If asked, compress the noise mask using a number of mel bands
             NM = sp.linbnd2fwbnd(NM, fs, dftlen, nm_nbbnds)
-            # Need to force to binary values because we don't use ambiguous values,
-            # we use the binary version at synthesis time.
-            NM[NM>=0.5] = 1.0
-            NM[NM<0.5] = 0.0
         if verbose>0: print('    Output Noise Mask size={} in: {}'.format(NM.shape, nm_file))
         NM.astype(np.float32).tofile(nm_file)
 
