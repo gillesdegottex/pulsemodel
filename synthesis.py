@@ -55,6 +55,7 @@ def synthesize(fs, f0s, SPEC, NM=None, wavlen=None
                 , f0s_rmsteps=False # Removes steps in the f0 curve
                                     # (see sigproc.resampling.f0s_rmsteps(.) )
                 , ener_multT0=False
+                , nm_forcebinary=False
                 , nm_lowpasswinlen=9
                 , hp_f0coef=0.5 # factor of f0 for the cut-off of the high-pass filter (def. 0.5*f0)
                 , antipreechohwindur=0.001 # [s]
@@ -93,6 +94,11 @@ def synthesize(fs, f0s, SPEC, NM=None, wavlen=None
         # Remove noise below f0, as it is supposed to be already the case
         for n in range(NM.shape[0]):
             NM[n,:int((float(dftlen)/fs)*2*f0s[n,1])] = 0.0
+
+    if nm_forcebinary:
+        print('    Forcing binary noise mask')
+        NM[NM<=0.5] = 0.0 # To be sure that voiced segments are not hoarse
+        NM[NM>0.5] = 1.0  # To be sure the noise segments are fully noisy
 
     # Generate the pulse positions [1](2) (i.e. the synthesis instants, the GCIs in voiced segments)
     ts = [0.0]
