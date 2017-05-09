@@ -83,9 +83,10 @@ def analysis_spec(wav, fs, f0s,
         # Estimate the amplitude spectral envelope
         print("    WARNING: straight_mcep is unavailable.")
         print("           A SIMPLISTIC Linear interpolation is used for the amplitude envelope.")
-        print("           Please replace it with a better one (e.g. STRAIGHT's).")
-        print("           If you use this simplistic envelope, the TTS quality is")
-        print("           very likely to be lower than that in the results reported.")
+        print("           ATTENTION: Do _NOT_ use this envelope for speech synthesis!")
+        print("           Please use a better one (e.g. STRAIGHT's).")
+        print("           If you use this simplistic envelope, the TTS quality will")
+        print("           be lower than that in the results reported.")
         SPEC = sp.multi_linear(sinsreg, fs, dftlen)
         SPEC = np.exp(SPEC)*np.sqrt(dftlen)
 
