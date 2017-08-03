@@ -54,6 +54,11 @@ def analysis_f0postproc(wav, fs, f0s, f0_min=60, f0_max=600,
         ts = (shift)*np.arange(len(f0s))
         f0s = np.vstack((ts, f0s)).T
 
+    # Fill with dummy f0 if all frames are unvoiced (ljuvela)
+    if len(f0s[f0s[:,1]>0, 0]) == 0:
+        f0s[:,1] = 200.0 # 5 ms step
+    
+        
     # Build the continuous f0
     f0s[:,1] = np.interp(f0s[:,0], f0s[f0s[:,1]>0,0], f0s[f0s[:,1]>0,1])
      # Avoid erratic values outside of the given interval
@@ -114,6 +119,7 @@ def analysis_pdd(wav, fs, f0s,
     # We don't provide an envelope estimate so the VTF's phase will stay in the computation
     # However, the VTF's phase is ~constant wrt time, thus disapear in the variance measure.
     # (The only risk is to have the VTF's variations that adds to PDD)
+    #import ipdb; ipdb.set_trace()
     PDD = sp.sinusoidal.estimate_pdd(sinsps, f0sps, fs, pdd_sin_nbperperiod, dftlen, outFscale=True, rmPDtrend=True, extrapDC=True)
 
     # Resample the feature from pitch synchronous to regular intervals
@@ -227,6 +233,7 @@ def analysisf(fwav
     , shift=0.005
     , dftlen=4096
     , inf0txt_file=None, f0_min=60, f0_max=600, f0_file=None
+    , inf0bin_file=None # input f0 file in binary
     , spec_file=None, spec_order=None # Mel-cepstral order for compressing the 
                             # spectrum (typically 59; None: no compression)
     , pdd_file=None, pdd_order=None   # Mel-cepstral order for compressing PDD
@@ -242,6 +249,10 @@ def analysisf(fwav
     f0s = None
     if inf0txt_file:
         f0s = np.loadtxt(inf0txt_file)
+        
+    # read input f0 file in float32 (ljuvela)    
+    if inf0bin_file:
+        f0s = np.fromfile(inf0bin_file, dtype=np.float32)        
 
     f0s = analysis_f0postproc(wav, fs, f0s, f0_min=f0_min, f0_max=f0_max, shift=shift, verbose=verbose)
 
@@ -288,6 +299,7 @@ if  __name__ == "__main__" :
     argpar.add_argument("--shift", default=0.005, type=float, help="time step[ms] between the input frames")
     argpar.add_argument("--dftlen", default=4096, type=float, help="Number of bins in the DFT")
     argpar.add_argument("--inf0txt", default=None, help="Given f0 file")
+    argpar.add_argument("--inf0bin", default=None, help="Given f0 file (single precision float binary)")
     argpar.add_argument("--f0_min", default=60, type=float, help="Minimal possible f0 value")
     argpar.add_argument("--f0_max", default=600, type=float, help="Maximal possible f0 value")
     argpar.add_argument("--f0", default=None, help="Output f0 file")
@@ -304,6 +316,7 @@ if  __name__ == "__main__" :
               , shift=args.shift
               , dftlen=args.dftlen
               , inf0txt_file=args.inf0txt, f0_min=args.f0_min, f0_max=args.f0_max, f0_file=args.f0
+              , inf0bin_file=args.inf0bin
               , spec_file=args.spec, spec_order=args.spec_order
               , pdd_file=args.pdd, pdd_order=args.pdd_order
               , nm_file=args.nm, nm_nbbnds=args.nm_nbbnds
