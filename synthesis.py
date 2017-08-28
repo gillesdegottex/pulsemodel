@@ -151,7 +151,7 @@ def synthesize(fs, f0s, SPEC, NM=None, wavlen=None
         winlen = int(np.max((0.050*fs, 3*fs/f0))/2)*2+1 # Has to be odd
         # TODO We also assume that the VTF's decay is shorter
         #      than 2 periods (dangerous with high pitched tense voice).
-        if winlen>dftlen: raise ValueError('winlen>dftlen')
+        if winlen>dftlen: raise ValueError('winlen({})>dftlen({})'.format(winlen, dftlen))
 
         # Set the rough position of the pulse in the window (the closest sample)
         # We keep a third of the window (1 period) on the left because the
