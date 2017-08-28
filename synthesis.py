@@ -308,7 +308,7 @@ if  __name__ == "__main__" :
     argpar.add_argument("--pddfile", default=None, help="Input Phase Distortion Deviation file [linear values]")
     argpar.add_argument("--nmfile", default=None, help="Output Noise Mask [linear values in [0,1] ]")
     argpar.add_argument("--nm_nbbnds", default=None, type=int, help="Number of mel-bands in the compressed noise mask (None: assume no compression)")
-    argpar.add_argument("--nm_forcebinary", action='store_true', help="Force binary values for the noisemask.")
+    argpar.add_argument("--nm_forcebinary", action='store_true', help="Force binary values for the noisemask (def. true)")
     argpar.add_argument("--fs", default=16000, type=int, help="Sampling frequency[Hz]")
     argpar.add_argument("--shift", default=0.005, type=float, help="Time step[s] between the frames")
     #argpar.add_argument("--dftlen", dftlen=4096, type=float, help="Size of the DFT for extracting the features")
