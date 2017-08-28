@@ -285,7 +285,8 @@ def synthesizef(fs, shift=0.005, dftlen=4096, ff0=None, flf0=None, fspec=None, f
     if fpdd:
         PDD = np.fromfile(fpdd, dtype=np.float32)
         PDD = PDD.reshape((len(f0), -1))
-        thresh = 0.75 # DegottexG2015jhmpd
+        thresh = 0.75 # For this value, see:
+        # G. Degottex and D. Erro, "A uniform phase representation for the harmonic model in speech synthesis applications," EURASIP, Journal on Audio, Speech, and Music Processing - Special Issue: Models of Speech - In Search of Better Representations, vol. 2014, iss. 1, p. 38, 2014.
         NM = PDD.copy()
         NM[PDD<thresh] = 0.0
         NM[PDD>thresh] = 1.0
