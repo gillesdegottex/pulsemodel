@@ -251,7 +251,7 @@ def synthesize(fs, f0s, SPEC, NM=None, wavlen=None
 
 
 
-def synthesizef(fs, shift=0.005, dftlen=4096, ff0=None, flf0=None, fspec=None, fmcep=None, fpdd=None, fnm=None, fbndnm=None, fsyn=None, verbose=1):
+def synthesizef(fs, shift=0.005, dftlen=4096, ff0=None, flf0=None, fspec=None, fmcep=None, fpdd=None, fnm=None, fbndnm=None, nm_forcebinary=False, fsyn=None, verbose=1):
     '''
     Call the synthesis from python using file inputs and outputs
     '''
@@ -288,7 +288,7 @@ def synthesizef(fs, shift=0.005, dftlen=4096, ff0=None, flf0=None, fspec=None, f
         NM[NM<=0.5] = 0.0
         NM[NM>0.5] = 1.0
 
-    syn = synthesize(fs, f0s, SPEC, NM=NM, verbose=verbose)
+    syn = synthesize(fs, f0s, SPEC, NM=NM, nm_forcebinary=nm_forcebinary, verbose=verbose)
     if fsyn:
         sp.wavwrite(fsyn, syn, fs, norm_abs=True, verbose=verbose)
 
@@ -308,6 +308,7 @@ if  __name__ == "__main__" :
     argpar.add_argument("--pddfile", default=None, help="Input Phase Distortion Deviation file [linear values]")
     argpar.add_argument("--nmfile", default=None, help="Output Noise Mask [linear values in [0,1] ]")
     argpar.add_argument("--nm_nbbnds", default=None, type=int, help="Number of mel-bands in the compressed noise mask (None: assume no compression)")
+    argpar.add_argument("--nm_forcebinary", action='store_true', help="Force binary values for the noisemask.")
     argpar.add_argument("--fs", default=16000, type=int, help="Sampling frequency[Hz]")
     argpar.add_argument("--shift", default=0.005, type=float, help="Time step[s] between the frames")
     #argpar.add_argument("--dftlen", dftlen=4096, type=float, help="Size of the DFT for extracting the features")
@@ -315,4 +316,4 @@ if  __name__ == "__main__" :
     args = argpar.parse_args()
     args.dftlen = 4096
 
-    synthesizef(args.fs, shift=args.shift, dftlen=args.dftlen, ff0=args.f0file, flf0=args.logf0file, fspec=args.specfile, fmcep=args.mcepfile, fnm=(None if args.nm_nbbnds else args.nmfile), fbndnm=(args.nmfile if args.nm_nbbnds else None), fpdd=args.pddfile, fsyn=args.synthfile, verbose=args.verbose)
+    synthesizef(args.fs, shift=args.shift, dftlen=args.dftlen, ff0=args.f0file, flf0=args.logf0file, fspec=args.specfile, fmcep=args.mcepfile, fnm=(None if args.nm_nbbnds else args.nmfile), fbndnm=(args.nmfile if args.nm_nbbnds else None), nm_forcebinary=args.nm_forcebinary, fpdd=args.pddfile, fsyn=args.synthfile, verbose=args.verbose)
