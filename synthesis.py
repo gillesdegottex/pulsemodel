@@ -55,7 +55,7 @@ def synthesize(fs, f0s, SPEC, NM=None, wavlen=None
                 , f0s_rmsteps=False # Removes steps in the f0 curve
                                     # (see sigproc.resampling.f0s_rmsteps(.) )
                 , ener_multT0=False
-                , nm_forcebinary=False
+                , nm_cont=False
                 , nm_lowpasswinlen=9
                 , hp_f0coef=0.5 # factor of f0 for the cut-off of the high-pass filter (def. 0.5*f0)
                 , antipreechohwindur=0.001 # [s]
@@ -96,7 +96,7 @@ def synthesize(fs, f0s, SPEC, NM=None, wavlen=None
         for n in range(NM.shape[0]):
             NM[n,:int((float(dftlen)/fs)*2*f0s[n,1])] = 0.0
 
-    if nm_forcebinary:
+    if not nm_cont:
         print('    Forcing binary noise mask')
         NM[NM<=0.5] = 0.0 # To be sure that voiced segments are not hoarse
         NM[NM>0.5] = 1.0  # To be sure the noise segments are fully noisy
@@ -262,7 +262,7 @@ def synthesize(fs, f0s, SPEC, NM=None, wavlen=None
 
 
 
-def synthesizef(fs, shift=0.005, dftlen=4096, ff0=None, flf0=None, fspec=None, fmcep=None, fpdd=None, fnm=None, fbndnm=None, nm_forcebinary=False, fsyn=None, verbose=1):
+def synthesizef(fs, shift=0.005, dftlen=4096, ff0=None, flf0=None, fspec=None, fmcep=None, fpdd=None, fnm=None, fbndnm=None, nm_cont=False, fsyn=None, verbose=1):
     '''
     Call the synthesis from python using file inputs and outputs
     '''
@@ -296,10 +296,8 @@ def synthesizef(fs, shift=0.005, dftlen=4096, ff0=None, flf0=None, fspec=None, f
         BNDNM = np.fromfile(fbndnm, dtype=np.float32)
         BNDNM = BNDNM.reshape((len(f0), -1))
         NM = sp.fwbnd2linbnd(BNDNM, fs, dftlen)
-        NM[NM<=0.5] = 0.0
-        NM[NM>0.5] = 1.0
 
-    syn = synthesize(fs, f0s, SPEC, NM=NM, nm_forcebinary=nm_forcebinary, verbose=verbose)
+    syn = synthesize(fs, f0s, SPEC, NM=NM, nm_cont=nm_cont, verbose=verbose)
     if fsyn:
         sp.wavwrite(fsyn, syn, fs, norm_abs=True, verbose=verbose)
 
@@ -319,7 +317,7 @@ if  __name__ == "__main__" :
     argpar.add_argument("--pddfile", default=None, help="Input Phase Distortion Deviation file [linear values]")
     argpar.add_argument("--nmfile", default=None, help="Output Noise Mask [linear values in [0,1] ]")
     argpar.add_argument("--nm_nbbnds", default=None, type=int, help="Number of mel-bands in the compressed noise mask (None: assume no compression)")
-    argpar.add_argument("--nm_forcebinary", action='store_true', help="Force binary values for the noisemask (def. true)")
+    argpar.add_argument("--nm_cont", action='store_true', help="Allow continuous values for the noisemask (def. False)")
     argpar.add_argument("--fs", default=16000, type=int, help="Sampling frequency[Hz]")
     argpar.add_argument("--shift", default=0.005, type=float, help="Time step[s] between the frames")
     #argpar.add_argument("--dftlen", dftlen=4096, type=float, help="Size of the DFT for extracting the features")
@@ -327,4 +325,4 @@ if  __name__ == "__main__" :
     args = argpar.parse_args()
     args.dftlen = 4096
 
-    synthesizef(args.fs, shift=args.shift, dftlen=args.dftlen, ff0=args.f0file, flf0=args.logf0file, fspec=args.specfile, fmcep=args.mcepfile, fnm=(None if args.nm_nbbnds else args.nmfile), fbndnm=(args.nmfile if args.nm_nbbnds else None), nm_forcebinary=args.nm_forcebinary, fpdd=args.pddfile, fsyn=args.synthfile, verbose=args.verbose)
+    synthesizef(args.fs, shift=args.shift, dftlen=args.dftlen, ff0=args.f0file, flf0=args.logf0file, fspec=args.specfile, fmcep=args.mcepfile, fnm=(None if args.nm_nbbnds else args.nmfile), fbndnm=(args.nmfile if args.nm_nbbnds else None), nm_cont=args.nm_cont, fpdd=args.pddfile, fsyn=args.synthfile, verbose=args.verbose)
