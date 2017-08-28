@@ -32,6 +32,7 @@ Author
 import argparse
 import sys
 import os
+import warnings
 
 import numpy as np
 
@@ -48,6 +49,12 @@ def analysis_f0postproc(wav, fs, f0s, f0_min=60, f0_max=600,
     if f0s is None:
         import sigproc.interfaces # Load it only if needed
         f0s = sigproc.interfaces.reaper(wav, fs, shift, f0_min, f0_max)
+
+    if not (f0s[:,1]>0).any():
+        warnings.warn('''\n\nWARNING: No F0 value can be estimated in this signal.
+         It will be replaced by the constant f0_min value ({}Hz).
+        '''.format(f0_min), RuntimeWarning)
+        f0s[:,1] = f0_min
 
     # Make two column matrix [ time[s], value[Hz] ]
     if len(f0s.shape)==1:
@@ -81,12 +88,14 @@ def analysis_spec(wav, fs, f0s,
         sinsreg, f0sps = sp.sinusoidal.estimate_sinusoidal_params(wav, fs, f0s, nbper=3, quadraticfit=True, verbose=verbose-1)
 
         # Estimate the amplitude spectral envelope
-        print("    WARNING: straight_mcep is unavailable.")
-        print("           A SIMPLISTIC Linear interpolation is used for the amplitude envelope.")
-        print("           ATTENTION: Do _NOT_ use this envelope for speech synthesis!")
-        print("           Please use a better one (e.g. STRAIGHT's).")
-        print("           If you use this simplistic envelope, the TTS quality will")
-        print("           be lower than that in the results reported.")
+        warnings.warn('''\n\nWARNING: straight_mcep is unavailable.
+         A SIMPLISTIC Linear interpolation is used for the amplitude envelope.
+         Do _NOT_ use this envelope for speech synthesis!
+         Please use a better one (e.g. STRAIGHT's).
+         If you use this simplistic envelope, the TTS quality will
+         be lower than that in the results reported.
+        ''', RuntimeWarning)
+
         SPEC = sp.multi_linear(sinsreg, fs, dftlen)
         SPEC = np.exp(SPEC)*np.sqrt(dftlen)
 
