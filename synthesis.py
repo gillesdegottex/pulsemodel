@@ -262,7 +262,7 @@ def synthesize(fs, f0s, SPEC, NM=None, wavlen=None
 
 
 
-def synthesizef(fs, shift=0.005, dftlen=4096, ff0=None, flf0=None, fspec=None, fmcep=None, fpdd=None, fnm=None, fbndnm=None, nm_cont=False, fsyn=None, verbose=1):
+def synthesizef(fs, shift=0.005, dftlen=4096, ff0=None, flf0=None, fspec=None, fmcep=None, fpdd=None, fmpdd=None, fnm=None, fbndnm=None, nm_cont=False, fsyn=None, verbose=1):
     '''
     Call the synthesis from python using file inputs and outputs
     '''
@@ -278,18 +278,27 @@ def synthesizef(fs, shift=0.005, dftlen=4096, ff0=None, flf0=None, fspec=None, f
         SPEC = np.fromfile(fspec, dtype=np.float32)
         SPEC = SPEC.reshape((len(f0), -1))
     if fmcep:
-        SPEC = np.fromfile(fmcep, dtype=np.float32)
-        SPEC = SPEC.reshape((len(f0), -1))
-        SPEC = sp.mcep2spec(SPEC, sp.bark_alpha(fs), dftlen)
+        MCEP = np.fromfile(fmcep, dtype=np.float32)
+        MCEP = MCEP.reshape((len(f0), -1))
+        SPEC = sp.mcep2spec(MCEP, sp.bark_alpha(fs), dftlen)
 
+    NM = None
+    pdd_thresh = 0.75 # For this value, see:
+        # G. Degottex and D. Erro, "A uniform phase representation for the harmonic model in speech synthesis applications," EURASIP, Journal on Audio, Speech, and Music Processing - Special Issue: Models of Speech - In Search of Better Representations, vol. 2014, iss. 1, p. 38, 2014.
     if fpdd:
         PDD = np.fromfile(fpdd, dtype=np.float32)
         PDD = PDD.reshape((len(f0), -1))
-        thresh = 0.75 # For this value, see:
-        # G. Degottex and D. Erro, "A uniform phase representation for the harmonic model in speech synthesis applications," EURASIP, Journal on Audio, Speech, and Music Processing - Special Issue: Models of Speech - In Search of Better Representations, vol. 2014, iss. 1, p. 38, 2014.
         NM = PDD.copy()
-        NM[PDD<thresh] = 0.0
-        NM[PDD>thresh] = 1.0
+        NM[PDD<pdd_thresh] = 0.0
+        NM[PDD>pdd_thresh] = 1.0
+    if fmpdd:
+        MPDD = np.fromfile(fmpdd, dtype=np.float32)
+        MPDD = MPDD.reshape((len(f0), -1))
+        PDD = sp.mcep2spec(MPDD, sp.bark_alpha(fs), dftlen)
+        NM = PDD.copy()
+        NM[PDD<pdd_thresh] = 0.0
+        NM[PDD>pdd_thresh] = 1.0
+
     if fnm:
         NM = np.fromfile(fnm, dtype=np.float32)
         NM = NM.reshape((len(f0), -1))
@@ -316,8 +325,9 @@ if  __name__ == "__main__" :
     argpar.add_argument("--specfile", default=None, help="Input amplitude spectrogram [linear values]")
     argpar.add_argument("--mcepfile", default=None, help="Input amplitude spectrogram [mel-cepstrum values]")
     argpar.add_argument("--pddfile", default=None, help="Input Phase Distortion Deviation file [linear values]")
+    argpar.add_argument("--mpddfile", default=None, help="Input Phase Distortion Deviation file [mel-cepstrum values]")
     argpar.add_argument("--nmfile", default=None, help="Output Noise Mask [linear values in [0,1] ]")
-    argpar.add_argument("--nm_nbbnds", default=None, type=int, help="Number of mel-bands in the compressed noise mask (None: assume no compression)")
+    argpar.add_argument("--bndnmfile", default=None, help="Output Noise Mask [compressed in bands with values still in [0,1] ]")
     argpar.add_argument("--nm_cont", action='store_true', help="Allow continuous values for the noisemask (def. False)")
     argpar.add_argument("--fs", default=16000, type=int, help="Sampling frequency[Hz]")
     argpar.add_argument("--shift", default=0.005, type=float, help="Time step[s] between the frames")
@@ -326,4 +336,4 @@ if  __name__ == "__main__" :
     args = argpar.parse_args()
     args.dftlen = 4096
 
-    synthesizef(args.fs, shift=args.shift, dftlen=args.dftlen, ff0=args.f0file, flf0=args.logf0file, fspec=args.specfile, fmcep=args.mcepfile, fnm=(None if args.nm_nbbnds else args.nmfile), fbndnm=(args.nmfile if args.nm_nbbnds else None), nm_cont=args.nm_cont, fpdd=args.pddfile, fsyn=args.synthfile, verbose=args.verbose)
+    synthesizef(args.fs, shift=args.shift, dftlen=args.dftlen, ff0=args.f0file, flf0=args.logf0file, fspec=args.specfile, fmcep=args.mcepfile, fnm=args.nmfile, fbndnm=args.bndnmfile, nm_cont=args.nm_cont, fpdd=args.pddfile, fmpdd=args.mpddfile, fsyn=args.synthfile, verbose=args.verbose)
