@@ -59,6 +59,7 @@ def synthesize(fs, f0s, SPEC, NM=None, wavlen=None
                 , nm_lowpasswinlen=9
                 , hp_f0coef=0.5 # factor of f0 for the cut-off of the high-pass filter (def. 0.5*f0)
                 , antipreechohwindur=0.001 # [s]
+                , pp_atten1stharminsilences=None # Typical value is -25
                 , verbose=1):
 
     # Copy the inputs to avoid modifying them
@@ -119,6 +120,12 @@ def synthesize(fs, f0s, SPEC, NM=None, wavlen=None
         idx = np.clip(idx, 0, SPEC.shape[0]-1)
         SPECR[n,:] = SPEC[idx,:]
 
+    # Keep trace of the median energy [dB] over the whole signal
+    ener = np.mean(SPECR, axis=1)
+    idxacs = np.where(sp.mag2db(ener) > sp.mag2db(np.max(ener))-30)[0] # Get approx active frames # TODO Param
+    enermed = sp.mag2db(np.median(ener[idxacs])) # Median energy [dB]
+    ener = sp.mag2db(ener)
+
     # Resample the noise feature to the pulse positions
     # Smooth the frequency response of the mask in order to avoid Gibbs
     # (poor Gibbs nobody want to see him)
@@ -177,7 +184,10 @@ def synthesize(fs, f0s, SPEC, NM=None, wavlen=None
         E = SPECR[n,:] # Take the amplitude from the given one
         if hp_f0coef!=None:
             # High-pass it to avoid any residual DC component.
-            HP = sp.butter2hspec(hp_f0coef*f0, 4, fs, dftlen, high=True)
+            fcut = hp_f0coef*f0
+            if not pp_atten1stharminsilences is None and ener[n]-enermed<pp_atten1stharminsilences:
+                fcut = 1.5*f0 # Try to cut between first and second harm
+            HP = sp.butter2hspec(fcut, 4, fs, dftlen, high=True)
             E *= HP
             # Not necessarily good as it is non-causal, so make it causal...
             # ... together with the VTF response below.
