@@ -129,7 +129,8 @@ def synthesize(fs, f0s, SPEC, NM=None, wavlen=None
         idx = int(np.round(t/shift)) # Nearest is better for plosives
         idx = np.clip(idx, 0, NM.shape[0]-1)
         NMR[n,:] = NM[idx,:]
-        NMR[n,:] = scipy.signal.filtfilt(nm_lowpasswin, [1.0], NMR[n,:])
+        if nm_lowpasswinlen>1:
+            NMR[n,:] = scipy.signal.filtfilt(nm_lowpasswin, [1.0], NMR[n,:])
 
     NMR = np.clip(NMR, 0.0, 1.0)
 
