@@ -232,17 +232,17 @@ def plot_features(wav=None, fs=None, f0s=None, SPEC=None, PDD=None, NM=None):
     axs[-1].set_xlabel('Time [s]')
     from IPython.core.debugger import  Pdb; Pdb().set_trace()
 
-def analysisf(fwav
-    , shift=0.005
-    , dftlen=4096
-    , inf0txt_file=None, f0_min=60, f0_max=600, f0_file=None
-    , spec_file=None, spec_order=None # Mel-cepstral order for compressing the 
-                            # spectrum (typically 59; None: no compression)
-    , pdd_file=None, pdd_order=None   # Mel-cepstral order for compressing PDD
-                            # spectrum (typically 59; None: no compression)
-    , nm_file=None, nm_nbbnds=None  # Number of mel-bands in the compressed mask
-                            # (None: no compression)
-    , verbose=1):
+def analysisf(fwav,
+        shift=0.005,
+        dftlen=4096,
+        inf0txt_file=None, f0_min=60, f0_max=600, f0_file=None, f0_log=False,
+        spec_file=None, spec_order=None, # Mel-cepstral order for compressing the 
+                                # spectrum (typically 59; None: no compression)
+        pdd_file=None, pdd_order=None,   # Mel-cepstral order for compressing PDD
+                                # spectrum (typically 59; None: no compression)
+        nm_file=None, nm_nbbnds=None,  # Number of mel-bands in the compressed mask
+                                # (None: no compression)
+        verbose=1):
 
     wav, fs, enc = sp.wavread(fwav)
 
@@ -255,8 +255,10 @@ def analysisf(fwav
     f0s = analysis_f0postproc(wav, fs, f0s, f0_min=f0_min, f0_max=f0_max, shift=shift, verbose=verbose)
 
     if f0_file:
-        if verbose>0: print('    Output F0 {} in: {}'.format(f0s[:,1].shape, f0_file))
-        f0s[:,1].astype(np.float32).tofile(f0_file)
+        f0_values = f0s[:,1]
+        if verbose>0: print('    Output F0 {} in: {}'.format(f0_values.shape, f0_file))
+        if f0_log: f0_values = np.log(f0_values)
+        f0_values.astype(np.float32).tofile(f0_file)
 
     SPEC = None
     if spec_file:
@@ -300,6 +302,7 @@ if  __name__ == "__main__" :
     argpar.add_argument("--f0_min", default=60, type=float, help="Minimal possible f0[Hz] value (def. 60Hz)")
     argpar.add_argument("--f0_max", default=600, type=float, help="Maximal possible f0[Hz] value (def. 600Hz)")
     argpar.add_argument("--f0", default=None, help="Output f0 file")
+    argpar.add_argument("--f0_log", action='store_true', help="Output f0 file with log Hertz values instead of linear Hertz (def. False)")
     argpar.add_argument("--spec", default=None, help="Output spectrum-related file")
     argpar.add_argument("--spec_order", default=None, help="Mel-cepstral order for the spectrogram (None:uncompressed; typically 59)")
     argpar.add_argument("--pdd", default=None, help="Output Phase Distortion Deviation (PDD) file")
@@ -309,11 +312,11 @@ if  __name__ == "__main__" :
     argpar.add_argument("--verbose", default=1, help="Output some information")
     args = argpar.parse_args()
 
-    analysisf(args.wavfile
-              , shift=args.shift
-              , dftlen=args.dftlen
-              , inf0txt_file=args.inf0txt, f0_min=args.f0_min, f0_max=args.f0_max, f0_file=args.f0
-              , spec_file=args.spec, spec_order=args.spec_order
-              , pdd_file=args.pdd, pdd_order=args.pdd_order
-              , nm_file=args.nm, nm_nbbnds=args.nm_nbbnds
-              , verbose=args.verbose)
+    analysisf(args.wavfile,
+              shift=args.shift,
+              dftlen=args.dftlen,
+              inf0txt_file=args.inf0txt, f0_min=args.f0_min, f0_max=args.f0_max, f0_file=args.f0, f0_log=args.f0_log,
+              spec_file=args.spec, spec_order=args.spec_order,
+              pdd_file=args.pdd, pdd_order=args.pdd_order,
+              nm_file=args.nm, nm_nbbnds=args.nm_nbbnds,
+              verbose=args.verbose)
