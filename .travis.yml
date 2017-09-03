@@ -23,6 +23,7 @@ before_install:
 
 install:
     - echo "install..."
+    - pip install --user cythonize
 
 script:
     - echo "script..."
