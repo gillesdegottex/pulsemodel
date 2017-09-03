@@ -22,7 +22,7 @@ before_install:
     - echo $TRAVIS_TAG
     
     - sudo apt-get -qq update
-    - sudo apt-get install -y cython
+    - sudo apt-get install -y cython python-numpy
 
 install:
     - echo "install..."
