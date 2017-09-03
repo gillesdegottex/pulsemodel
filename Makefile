@@ -17,7 +17,7 @@ build_sigproc: sigproc/sinusoidal.pyx
 external/pyworld/lib/World:
 	git submodule update --init
 
-build_pyworld: external/pyworld/pyworld.so
+build_pyworld: external/pyworld/lib/World
 	cd external/pyworld; python setup.py build_ext --inplace
 
 	
