@@ -42,7 +42,9 @@
 
 RESYNTHESIS=slt_arctic_a0010.resynth.wav bdl_arctic_a0020.resynth.wav clb_arctic_a0030.resynth.wav awb_arctic_a0040.resynth.wav
 
-all: samples.scp smoke
+all:
+	$(MAKE) samples.scp
+	$(MAKE) smoke
 	$(MAKE) ${RESYNTHESIS}
 
 samples.scp:
@@ -61,19 +63,21 @@ smoke: samples.scp
 	python ../analysis.py smoke.wav --inf0txt smoke.f0.txt --f0 smoke.f0
 	python ../analysis.py smoke.wav --inf0txt smoke.f0.txt --f0 smoke.logf0 --f0_log
 	python ../analysis.py smoke.wav --inf0txt smoke.f0.txt --spec smoke.spec
-	python ../analysis.py smoke.wav --inf0txt smoke.f0.txt --spec smoke.mcep --spec_order 59
 	python ../analysis.py smoke.wav --inf0txt smoke.f0.txt --pdd smoke.pdd
-	python ../analysis.py smoke.wav --inf0txt smoke.f0.txt --pdd smoke.mpdd --spec_order 59
 	python ../analysis.py smoke.wav --inf0txt smoke.f0.txt --nm smoke.nm
 	python ../analysis.py smoke.wav --inf0txt smoke.f0.txt --nm smoke.bndnm --nm_nbbnds 25
 	python ../synthesis.py smoke.resynth.wav --fs 16000 --f0file smoke.f0 --spec smoke.spec
 	python ../synthesis.py smoke.resynth.wav --fs 16000 --logf0file smoke.logf0 --spec smoke.spec
-	python ../synthesis.py smoke.resynth.wav --fs 16000 --f0file smoke.f0 --mcepfile smoke.mcep
 	python ../synthesis.py smoke.resynth.wav --fs 16000 --f0file smoke.f0 --specfile smoke.spec --pddfile smoke.pdd
-	python ../synthesis.py smoke.resynth.wav --fs 16000 --f0file smoke.f0 --specfile smoke.spec --mpddfile smoke.mpdd
 	python ../synthesis.py smoke.resynth.wav --fs 16000 --f0file smoke.f0 --specfile smoke.spec --nmfile smoke.nm
 	python ../synthesis.py smoke.resynth.wav --fs 16000 --f0file smoke.f0 --specfile smoke.spec --bndnmfile smoke.bndnm
 
+smoke_mcp:
+	python ../analysis.py smoke.wav --inf0txt smoke.f0.txt --spec smoke.mcep --spec_order 59
+	python ../analysis.py smoke.wav --inf0txt smoke.f0.txt --pdd smoke.mpdd --spec_order 59
+	python ../synthesis.py smoke.resynth.wav --fs 16000 --f0file smoke.f0 --mcepfile smoke.mcep
+	python ../synthesis.py smoke.resynth.wav --fs 16000 --f0file smoke.f0 --specfile smoke.spec --mpddfile smoke.mpdd
+	
 # Analysis ---------------------------------------------------------------------
 
 %.f0 %.spec %.pdd: %.wav %.f0.txt ../analysis.py
