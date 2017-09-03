@@ -38,6 +38,7 @@ import numpy as np
 
 import sigproc as sp
 import sigproc.pystraight
+import sigproc.interfaces
 
 def analysis_f0postproc(wav, fs, f0s, f0_min=60, f0_max=600,
              shift=0.005,        # Usually 5ms
@@ -47,7 +48,6 @@ def analysis_f0postproc(wav, fs, f0s, f0_min=60, f0_max=600,
     If f0s==None, an F0 estimate is extracted using REAPER.
     '''
     if f0s is None:
-        import sigproc.interfaces # Load it only if needed
         f0s = sigproc.interfaces.reaper(wav, fs, shift, f0_min, f0_max)
 
     if not (f0s[:,1]>0).any():
@@ -80,16 +80,36 @@ def analysis_spec(wav, fs, f0s,
     '''
     Estimate the amplitude spectral envelope.
     '''
-    if sigproc.pystraight.isanalysiseavailable():
+
+    # Add the potential path for WORLD vocoder
+    sys.path.insert(0, os.path.join(os.path.split(os.path.realpath(__file__))[0],'external/pyworld/pyworld'))
+
+    if sp.pystraight.isanalysiseavailable():
+        # Use STRAIGHT's envelope if available (as in PML's publications)
         SPEC = sigproc.pystraight.analysis_spec(wav, fs, f0s, shift, dftlen, keeplen=True)
+
+    elif sigproc.interfaces.worldvocoder_is_available():
+        warnings.warn('''\n\nWARNING: straight_mcep is not available,
+            but WORLD vocoder has been detected and will be used instead.
+            Note that PML-related publications present results using STRAIGHT vocoder.
+            The results might be thus different.
+        ''', RuntimeWarning)
+
+        # Then try WORLD vocoder
+        import pyworld
+        #_f0, ts = pyworld.dio(x, fs, frame_period=shift*1000)    # raw pitch extractor # Use REAPER instead
+        pwts = np.ascontiguousarray(f0s[:,0])
+        pwf0 = pyworld.stonemask(wav, np.ascontiguousarray(f0s[:,1]), pwts, fs)  # pitch refinement
+        SPEC = pyworld.cheaptrick(wav, pwf0, pwts, fs, fft_size=dftlen)  # extract smoothed spectrogram
+        SPEC = 10.0*np.sqrt(SPEC) # TODO Best gain correction I could find. Hard to find the good one between PML and WORLD different syntheses
+
     else:
         # Estimate the sinusoidal parameters at regular intervals in order
         # to build the amplitude spectral envelope
         sinsreg, f0sps = sp.sinusoidal.estimate_sinusoidal_params(wav, fs, f0s, nbper=3, quadraticfit=True, verbose=verbose-1)
 
-        # Estimate the amplitude spectral envelope
-        warnings.warn('''\n\nWARNING: straight_mcep is unavailable.
-         A SIMPLISTIC Linear interpolation is used for the amplitude envelope.
+        warnings.warn('''\n\nWARNING: Neither straight_mcep nor WORLD's cheaptrick spectral envelope estimators are available.
+         Thus, a SIMPLISTIC Linear interpolation will be used for the spectral envelope.
          Do _NOT_ use this envelope for speech synthesis!
          Please use a better one (e.g. STRAIGHT's).
          If you use this simplistic envelope, the TTS quality will
