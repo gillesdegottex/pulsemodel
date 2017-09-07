@@ -56,7 +56,7 @@ samples.scp:
 
 
 smoke: samples.scp
-	# Use just one example
+        # Use just one example
 	cp awb_arctic_a0040.wav smoke.wav
 	cp awb_arctic_a0040.f0.txt smoke.f0.txt
 	python ../analysis.py smoke.wav --inf0txt smoke.f0.txt
@@ -66,6 +66,8 @@ smoke: samples.scp
 	python ../analysis.py smoke.wav --inf0txt smoke.f0.txt --pdd smoke.pdd
 	python ../analysis.py smoke.wav --inf0txt smoke.f0.txt --nm smoke.nm
 	python ../analysis.py smoke.wav --inf0txt smoke.f0.txt --nm smoke.bndnm --nm_nbbnds 25
+        # use sptk style binary input F0
+	python ../analysis.py smoke.wav --inf0bin smoke.f0 --nm smoke.bndnm --nm_nbbnds 25		
 	python ../synthesis.py smoke.resynth.wav --fs 16000 --f0file smoke.f0 --spec smoke.spec
 	python ../synthesis.py smoke.resynth.wav --fs 16000 --logf0file smoke.logf0 --spec smoke.spec
 	python ../synthesis.py smoke.resynth.wav --fs 16000 --f0file smoke.f0 --specfile smoke.spec --pddfile smoke.pdd
@@ -77,7 +79,7 @@ smoke_mcp:
 	python ../analysis.py smoke.wav --inf0txt smoke.f0.txt --pdd smoke.mpdd --spec_order 59
 	python ../synthesis.py smoke.resynth.wav --fs 16000 --f0file smoke.f0 --mcepfile smoke.mcep
 	python ../synthesis.py smoke.resynth.wav --fs 16000 --f0file smoke.f0 --specfile smoke.spec --mpddfile smoke.mpdd
-	
+
 # Analysis ---------------------------------------------------------------------
 
 %.f0 %.spec %.pdd: %.wav %.f0.txt ../analysis.py
@@ -115,7 +117,7 @@ clean:
 distclean:
 	rm -f samples.scp *.wav *.f0 *.logf0 *.spec *.pdd *.mpdd *.nm *.bndnm *.diff
 
-	
+
 # For debugging purpose --------------------------------------------------------
 .PHONY: testref makeref
 

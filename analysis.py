@@ -144,7 +144,6 @@ def analysis_pdd(wav, fs, f0s,
     # We don't provide an envelope estimate so the VTF's phase will stay in the computation
     # However, the VTF's phase is ~constant wrt time, thus disapear in the variance measure.
     # (The only risk is to have the VTF's variations that adds to PDD)
-    #import ipdb; ipdb.set_trace()
     PDD = sp.sinusoidal.estimate_pdd(sinsps, f0sps, fs, pdd_sin_nbperperiod, dftlen, outFscale=True, rmPDtrend=True, extrapDC=True)
 
     # Resample the feature from pitch synchronous to regular intervals
