@@ -1,4 +1,4 @@
-.PHONY: build submodule_init build_sigproc build_pyworld
+.PHONY: build submodule_init build_sigproc build_reaper build_pyworld
 
 
 all: build
