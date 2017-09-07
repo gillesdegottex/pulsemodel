@@ -58,7 +58,6 @@ samples.scp:
 smoke: samples.scp
 	# Use just one example
 	cp awb_arctic_a0040.wav smoke.wav
-	cp awb_arctic_a0040.f0.txt smoke.f0.txt
 	python ../analysis.py smoke.wav 
 	python ../analysis.py smoke.wav --f0 smoke.f0
 	python ../analysis.py smoke.wav --f0 smoke.logf0 --f0_log
