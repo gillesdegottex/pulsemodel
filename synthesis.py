@@ -55,10 +55,11 @@ def synthesize(fs, f0s, SPEC, NM=None, wavlen=None
                 , f0s_rmsteps=False # Removes steps in the f0 curve
                                     # (see sigproc.resampling.f0s_rmsteps(.) )
                 , ener_multT0=False
-                , nm_forcebinary=False
+                , nm_cont=False
                 , nm_lowpasswinlen=9
                 , hp_f0coef=0.5 # factor of f0 for the cut-off of the high-pass filter (def. 0.5*f0)
                 , antipreechohwindur=0.001 # [s]
+                , pp_atten1stharminsilences=None # Typical value is -25
                 , verbose=1):
 
     # Copy the inputs to avoid modifying them
@@ -95,7 +96,7 @@ def synthesize(fs, f0s, SPEC, NM=None, wavlen=None
         for n in range(NM.shape[0]):
             NM[n,:int((float(dftlen)/fs)*2*f0s[n,1])] = 0.0
 
-    if nm_forcebinary:
+    if not nm_cont:
         print('    Forcing binary noise mask')
         NM[NM<=0.5] = 0.0 # To be sure that voiced segments are not hoarse
         NM[NM>0.5] = 1.0  # To be sure the noise segments are fully noisy
@@ -119,6 +120,12 @@ def synthesize(fs, f0s, SPEC, NM=None, wavlen=None
         idx = np.clip(idx, 0, SPEC.shape[0]-1)
         SPECR[n,:] = SPEC[idx,:]
 
+    # Keep trace of the median energy [dB] over the whole signal
+    ener = np.mean(SPECR, axis=1)
+    idxacs = np.where(sp.mag2db(ener) > sp.mag2db(np.max(ener))-30)[0] # Get approx active frames # TODO Param
+    enermed = sp.mag2db(np.median(ener[idxacs])) # Median energy [dB]
+    ener = sp.mag2db(ener)
+
     # Resample the noise feature to the pulse positions
     # Smooth the frequency response of the mask in order to avoid Gibbs
     # (poor Gibbs nobody want to see him)
@@ -129,7 +136,8 @@ def synthesize(fs, f0s, SPEC, NM=None, wavlen=None
         idx = int(np.round(t/shift)) # Nearest is better for plosives
         idx = np.clip(idx, 0, NM.shape[0]-1)
         NMR[n,:] = NM[idx,:]
-        NMR[n,:] = scipy.signal.filtfilt(nm_lowpasswin, [1.0], NMR[n,:])
+        if nm_lowpasswinlen>1:
+            NMR[n,:] = scipy.signal.filtfilt(nm_lowpasswin, [1.0], NMR[n,:])
 
     NMR = np.clip(NMR, 0.0, 1.0)
 
@@ -150,7 +158,7 @@ def synthesize(fs, f0s, SPEC, NM=None, wavlen=None
         winlen = int(np.max((0.050*fs, 3*fs/f0))/2)*2+1 # Has to be odd
         # TODO We also assume that the VTF's decay is shorter
         #      than 2 periods (dangerous with high pitched tense voice).
-        if winlen>dftlen: raise ValueError('winlen>dftlen')
+        if winlen>dftlen: raise ValueError('winlen({})>dftlen({})'.format(winlen, dftlen))
 
         # Set the rough position of the pulse in the window (the closest sample)
         # We keep a third of the window (1 period) on the left because the
@@ -176,7 +184,10 @@ def synthesize(fs, f0s, SPEC, NM=None, wavlen=None
         E = SPECR[n,:] # Take the amplitude from the given one
         if hp_f0coef!=None:
             # High-pass it to avoid any residual DC component.
-            HP = sp.butter2hspec(hp_f0coef*f0, 4, fs, dftlen, high=True)
+            fcut = hp_f0coef*f0
+            if not pp_atten1stharminsilences is None and ener[n]-enermed<pp_atten1stharminsilences:
+                fcut = 1.5*f0 # Try to cut between first and second harm
+            HP = sp.butter2hspec(fcut, 4, fs, dftlen, high=True)
             E *= HP
             # Not necessarily good as it is non-causal, so make it causal...
             # ... together with the VTF response below.
@@ -251,7 +262,7 @@ def synthesize(fs, f0s, SPEC, NM=None, wavlen=None
 
 
 
-def synthesizef(fs, shift=0.005, dftlen=4096, ff0=None, flf0=None, fspec=None, fmcep=None, fpdd=None, fnm=None, fbndnm=None, fsyn=None, verbose=1):
+def synthesizef(fs, shift=0.005, dftlen=4096, ff0=None, flf0=None, fspec=None, fmcep=None, fpdd=None, fmpdd=None, fnm=None, fbndnm=None, nm_cont=False, fsyn=None, verbose=1):
     '''
     Call the synthesis from python using file inputs and outputs
     '''
@@ -267,17 +278,27 @@ def synthesizef(fs, shift=0.005, dftlen=4096, ff0=None, flf0=None, fspec=None, f
         SPEC = np.fromfile(fspec, dtype=np.float32)
         SPEC = SPEC.reshape((len(f0), -1))
     if fmcep:
-        SPEC = np.fromfile(fmcep, dtype=np.float32)
-        SPEC = SPEC.reshape((len(f0), -1))
-        SPEC = sp.mcep2spec(SPEC, sp.bark_alpha(fs), dftlen)
+        MCEP = np.fromfile(fmcep, dtype=np.float32)
+        MCEP = MCEP.reshape((len(f0), -1))
+        SPEC = sp.mcep2spec(MCEP, sp.bark_alpha(fs), dftlen)
 
+    NM = None
+    pdd_thresh = 0.75 # For this value, see:
+        # G. Degottex and D. Erro, "A uniform phase representation for the harmonic model in speech synthesis applications," EURASIP, Journal on Audio, Speech, and Music Processing - Special Issue: Models of Speech - In Search of Better Representations, vol. 2014, iss. 1, p. 38, 2014.
     if fpdd:
         PDD = np.fromfile(fpdd, dtype=np.float32)
         PDD = PDD.reshape((len(f0), -1))
-        thresh = 0.75 # DegottexG2015jhmpd
         NM = PDD.copy()
-        NM[PDD<thresh] = 0.0
-        NM[PDD>thresh] = 1.0
+        NM[PDD<pdd_thresh] = 0.0
+        NM[PDD>pdd_thresh] = 1.0
+    if fmpdd:
+        MPDD = np.fromfile(fmpdd, dtype=np.float32)
+        MPDD = MPDD.reshape((len(f0), -1))
+        PDD = sp.mcep2spec(MPDD, sp.bark_alpha(fs), dftlen)
+        NM = PDD.copy()
+        NM[PDD<pdd_thresh] = 0.0
+        NM[PDD>pdd_thresh] = 1.0
+
     if fnm:
         NM = np.fromfile(fnm, dtype=np.float32)
         NM = NM.reshape((len(f0), -1))
@@ -285,10 +306,8 @@ def synthesizef(fs, shift=0.005, dftlen=4096, ff0=None, flf0=None, fspec=None, f
         BNDNM = np.fromfile(fbndnm, dtype=np.float32)
         BNDNM = BNDNM.reshape((len(f0), -1))
         NM = sp.fwbnd2linbnd(BNDNM, fs, dftlen)
-        NM[NM<=0.5] = 0.0
-        NM[NM>0.5] = 1.0
 
-    syn = synthesize(fs, f0s, SPEC, NM=NM, verbose=verbose)
+    syn = synthesize(fs, f0s, SPEC, NM=NM, nm_cont=nm_cont, verbose=verbose)
     if fsyn:
         sp.wavwrite(fsyn, syn, fs, norm_abs=True, verbose=verbose)
 
@@ -301,18 +320,20 @@ if  __name__ == "__main__" :
 
     argpar = argparse.ArgumentParser()
     argpar.add_argument("synthfile", help="Output synthesis file")
-    argpar.add_argument("--f0file", default=None, help="Input f0 file (values in [Hz])")
-    argpar.add_argument("--logf0file", default=None, help="Input f0 file (values in [log Hz])")
-    argpar.add_argument("--specfile", default=None, help="Input amplitude spectrogram (linear values)")
-    argpar.add_argument("--mcepfile", default=None, help="Input amplitude spectrogram (mel-cepstrum values)")
-    argpar.add_argument("--pddfile", default=None, help="Input Phase Distortion Deviation file (linear values)")
-    argpar.add_argument("--noisemaskfile", default=None, help="Output Noise Mask (linear values in [0,1])")
-    argpar.add_argument("--noisemask_nbbnds", default=None, type=int, help="Number of mel-bands in the compressed noise mask (None: Consider there is no compression)")
-    argpar.add_argument("--fs", default=16000, type=int, help="Sampling frequency [Hz]")
-    argpar.add_argument("--shift", default=0.005, type=float, help="Time step[ms] between the frames")
+    argpar.add_argument("--f0file", default=None, help="Input f0[Hz] file")
+    argpar.add_argument("--logf0file", default=None, help="Input f0[log Hz] file")
+    argpar.add_argument("--specfile", default=None, help="Input amplitude spectrogram [linear values]")
+    argpar.add_argument("--mcepfile", default=None, help="Input amplitude spectrogram [mel-cepstrum values]")
+    argpar.add_argument("--pddfile", default=None, help="Input Phase Distortion Deviation file [linear values]")
+    argpar.add_argument("--mpddfile", default=None, help="Input Phase Distortion Deviation file [mel-cepstrum values]")
+    argpar.add_argument("--nmfile", default=None, help="Output Noise Mask [linear values in [0,1] ]")
+    argpar.add_argument("--bndnmfile", default=None, help="Output Noise Mask [compressed in bands with values still in [0,1] ]")
+    argpar.add_argument("--nm_cont", action='store_true', help="Allow continuous values for the noisemask (def. False)")
+    argpar.add_argument("--fs", default=16000, type=int, help="Sampling frequency[Hz]")
+    argpar.add_argument("--shift", default=0.005, type=float, help="Time step[s] between the frames")
     #argpar.add_argument("--dftlen", dftlen=4096, type=float, help="Size of the DFT for extracting the features")
     argpar.add_argument("--verbose", default=1, help="Output some information")
     args = argpar.parse_args()
     args.dftlen = 4096
 
-    synthesizef(args.fs, shift=args.shift, dftlen=args.dftlen, ff0=args.f0file, flf0=args.logf0file, fspec=args.specfile, fmcep=args.mcepfile, fnm=(None if args.noisemask_nbbnds else args.noisemaskfile), fbndnm=(args.noisemaskfile if args.noisemask_nbbnds else None), fpdd=args.pddfile, fsyn=args.synthfile, verbose=args.verbose)
+    synthesizef(args.fs, shift=args.shift, dftlen=args.dftlen, ff0=args.f0file, flf0=args.logf0file, fspec=args.specfile, fmcep=args.mcepfile, fnm=args.nmfile, fbndnm=args.bndnmfile, nm_cont=args.nm_cont, fpdd=args.pddfile, fmpdd=args.mpddfile, fsyn=args.synthfile, verbose=args.verbose)

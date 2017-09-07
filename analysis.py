@@ -32,11 +32,13 @@ Author
 import argparse
 import sys
 import os
+import warnings
 
 import numpy as np
 
 import sigproc as sp
 import sigproc.pystraight
+import sigproc.interfaces
 
 def analysis_f0postproc(wav, fs, f0s, f0_min=60, f0_max=600,
              shift=0.005,        # Usually 5ms
@@ -46,18 +48,19 @@ def analysis_f0postproc(wav, fs, f0s, f0_min=60, f0_max=600,
     If f0s==None, an F0 estimate is extracted using REAPER.
     '''
     if f0s is None:
-        import sigproc.interfaces # Load it only if needed
         f0s = sigproc.interfaces.reaper(wav, fs, shift, f0_min, f0_max)
 
-    # Make two column matrix [ time[s], value[Hz] ]
+    # If only values are given, make two column matrix [time[s], value[Hz]] (ljuvela)
     if len(f0s.shape)==1:
         ts = (shift)*np.arange(len(f0s))
         f0s = np.vstack((ts, f0s)).T
+        
+    if not (f0s[:,1]>0).any():
+        warnings.warn('''\n\nWARNING: No F0 value can be estimated in this signal.
+         It will be replaced by the constant f0_min value ({}Hz).
+        '''.format(f0_min), RuntimeWarning)
+        f0s[:,1] = f0_min
 
-    # Fill with dummy f0 if all frames are unvoiced (ljuvela)
-    if len(f0s[f0s[:,1]>0, 0]) == 0:
-        f0s[:,1] = 200.0 # 5 ms step
-    
         
     # Build the continuous f0
     f0s[:,1] = np.interp(f0s[:,0], f0s[f0s[:,1]>0,0], f0s[f0s[:,1]>0,1])
@@ -78,20 +81,42 @@ def analysis_spec(wav, fs, f0s,
     '''
     Estimate the amplitude spectral envelope.
     '''
-    if sigproc.pystraight.isanalysiseavailable():
+
+    # Add the potential path for WORLD vocoder
+    sys.path.insert(0, os.path.join(os.path.split(os.path.realpath(__file__))[0],'external/pyworld/pyworld'))
+
+    if sp.pystraight.isanalysiseavailable():
+        # Use STRAIGHT's envelope if available (as in PML's publications)
         SPEC = sigproc.pystraight.analysis_spec(wav, fs, f0s, shift, dftlen, keeplen=True)
+
+    elif sigproc.interfaces.worldvocoder_is_available():
+        warnings.warn('''\n\nWARNING: straight_mcep is not available,
+            but WORLD vocoder has been detected and will be used instead.
+            Note that PML-related publications present results using STRAIGHT vocoder.
+            The results might be thus different.
+        ''', RuntimeWarning)
+
+        # Then try WORLD vocoder
+        import pyworld
+        #_f0, ts = pyworld.dio(x, fs, frame_period=shift*1000)    # raw pitch extractor # Use REAPER instead
+        pwts = np.ascontiguousarray(f0s[:,0])
+        pwf0 = pyworld.stonemask(wav, np.ascontiguousarray(f0s[:,1]), pwts, fs)  # pitch refinement
+        SPEC = pyworld.cheaptrick(wav, pwf0, pwts, fs, fft_size=dftlen)  # extract smoothed spectrogram
+        SPEC = 10.0*np.sqrt(SPEC) # TODO Best gain correction I could find. Hard to find the good one between PML and WORLD different syntheses
+
     else:
         # Estimate the sinusoidal parameters at regular intervals in order
         # to build the amplitude spectral envelope
         sinsreg, f0sps = sp.sinusoidal.estimate_sinusoidal_params(wav, fs, f0s, nbper=3, quadraticfit=True, verbose=verbose-1)
 
-        # Estimate the amplitude spectral envelope
-        print("    WARNING: straight_mcep is unavailable.")
-        print("           A SIMPLISTIC Linear interpolation is used for the amplitude envelope.")
-        print("           ATTENTION: Do _NOT_ use this envelope for speech synthesis!")
-        print("           Please use a better one (e.g. STRAIGHT's).")
-        print("           If you use this simplistic envelope, the TTS quality will")
-        print("           be lower than that in the results reported.")
+        warnings.warn('''\n\nWARNING: Neither straight_mcep nor WORLD's cheaptrick spectral envelope estimators are available.
+         Thus, a SIMPLISTIC Linear interpolation will be used for the spectral envelope.
+         Do _NOT_ use this envelope for speech synthesis!
+         Please use a better one (e.g. STRAIGHT's).
+         If you use this simplistic envelope, the TTS quality will
+         be lower than that in the results reported.
+        ''', RuntimeWarning)
+
         SPEC = sp.multi_linear(sinsreg, fs, dftlen)
         SPEC = np.exp(SPEC)*np.sqrt(dftlen)
 
@@ -229,18 +254,18 @@ def plot_features(wav=None, fs=None, f0s=None, SPEC=None, PDD=None, NM=None):
     axs[-1].set_xlabel('Time [s]')
     from IPython.core.debugger import  Pdb; Pdb().set_trace()
 
-def analysisf(fwav
-    , shift=0.005
-    , dftlen=4096
-    , inf0txt_file=None, f0_min=60, f0_max=600, f0_file=None
-    , inf0bin_file=None # input f0 file in binary
-    , spec_file=None, spec_order=None # Mel-cepstral order for compressing the 
-                            # spectrum (typically 59; None: no compression)
-    , pdd_file=None, pdd_order=None   # Mel-cepstral order for compressing PDD
-                            # spectrum (typically 59; None: no compression)
-    , nm_file=None, nm_nbbnds=None  # Number of mel-bands in the compressed mask
-                            # (None: no compression)
-    , verbose=1):
+def analysisf(fwav,
+        shift=0.005,
+        dftlen=4096,
+        inf0txt_file=None, f0_min=60, f0_max=600, f0_file=None, f0_log=False,
+        inf0bin_file=None, # input f0 file in binary
+        spec_file=None, spec_order=None, # Mel-cepstral order for compressing the 
+                                # spectrum (typically 59; None: no compression)
+        pdd_file=None, pdd_order=None,   # Mel-cepstral order for compressing PDD
+                                # spectrum (typically 59; None: no compression)
+        nm_file=None, nm_nbbnds=None,  # Number of mel-bands in the compressed mask
+                                # (None: no compression)
+        verbose=1):
 
     wav, fs, enc = sp.wavread(fwav)
 
@@ -257,8 +282,10 @@ def analysisf(fwav
     f0s = analysis_f0postproc(wav, fs, f0s, f0_min=f0_min, f0_max=f0_max, shift=shift, verbose=verbose)
 
     if f0_file:
-        if verbose>0: print('    Output F0 {} in: {}'.format(f0s[:,1].shape, f0_file))
-        f0s[:,1].astype(np.float32).tofile(f0_file)
+        f0_values = f0s[:,1]
+        if verbose>0: print('    Output F0 {} in: {}'.format(f0_values.shape, f0_file))
+        if f0_log: f0_values = np.log(f0_values)
+        f0_values.astype(np.float32).tofile(f0_file)
 
     SPEC = None
     if spec_file:
@@ -296,13 +323,14 @@ def analysisf(fwav
 if  __name__ == "__main__" :
     argpar = argparse.ArgumentParser()
     argpar.add_argument("wavfile", help="Input wav file")
-    argpar.add_argument("--shift", default=0.005, type=float, help="time step[ms] between the input frames")
-    argpar.add_argument("--dftlen", default=4096, type=float, help="Number of bins in the DFT")
+    argpar.add_argument("--shift", default=0.005, type=float, help="time step[s] between the input frames (def. 0.005s)")
+    argpar.add_argument("--dftlen", default=4096, type=float, help="Number of bins in the DFT (def. 4096)")
     argpar.add_argument("--inf0txt", default=None, help="Given f0 file")
     argpar.add_argument("--inf0bin", default=None, help="Given f0 file (single precision float binary)")
-    argpar.add_argument("--f0_min", default=60, type=float, help="Minimal possible f0 value")
-    argpar.add_argument("--f0_max", default=600, type=float, help="Maximal possible f0 value")
+    argpar.add_argument("--f0_min", default=60, type=float, help="Minimal possible f0[Hz] value (def. 60Hz)")
+    argpar.add_argument("--f0_max", default=600, type=float, help="Maximal possible f0[Hz] value (def. 600Hz)")
     argpar.add_argument("--f0", default=None, help="Output f0 file")
+    argpar.add_argument("--f0_log", action='store_true', help="Output f0 file with log Hertz values instead of linear Hertz (def. False)")
     argpar.add_argument("--spec", default=None, help="Output spectrum-related file")
     argpar.add_argument("--spec_order", default=None, help="Mel-cepstral order for the spectrogram (None:uncompressed; typically 59)")
     argpar.add_argument("--pdd", default=None, help="Output Phase Distortion Deviation (PDD) file")
@@ -312,12 +340,12 @@ if  __name__ == "__main__" :
     argpar.add_argument("--verbose", default=1, help="Output some information")
     args = argpar.parse_args()
 
-    analysisf(args.wavfile
-              , shift=args.shift
-              , dftlen=args.dftlen
-              , inf0txt_file=args.inf0txt, f0_min=args.f0_min, f0_max=args.f0_max, f0_file=args.f0
-              , inf0bin_file=args.inf0bin
-              , spec_file=args.spec, spec_order=args.spec_order
-              , pdd_file=args.pdd, pdd_order=args.pdd_order
-              , nm_file=args.nm, nm_nbbnds=args.nm_nbbnds
-              , verbose=args.verbose)
+    analysisf(args.wavfile,
+              shift=args.shift,
+              dftlen=args.dftlen,
+              inf0txt_file=args.inf0txt, f0_min=args.f0_min, f0_max=args.f0_max, f0_file=args.f0, f0_log=args.f0_log,
+              inf0bin_file=args.inf0bin,
+              spec_file=args.spec, spec_order=args.spec_order,
+              pdd_file=args.pdd, pdd_order=args.pdd_order,
+              nm_file=args.nm, nm_nbbnds=args.nm_nbbnds,
+              verbose=args.verbose)

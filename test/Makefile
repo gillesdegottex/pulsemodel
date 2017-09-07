@@ -1,6 +1,9 @@
 # Run analysis/re-synthesis (copy-synthesis) on some samples
 # 
 # Description
+#   * To run all the tests, you need the following executable:
+#     reaper (https://github.com/google/REAPER)
+#     mcep and mgc2sp (http://sp-tk.sourceforge.net/)
 #   * For the sake of completness this script is extracting a spectral envelope
 #     (somestimes called spectrogram in vocoding) (named $FILENAME.spec below)
 #     The used method is a SIMPLISTIC NASTY IDIOTIC Linear interpolation.
@@ -35,10 +38,13 @@
 
 .PRECIOUS: %.resynth.wav %.wav %.f0 %.spec %.pdd %.nm %.bndnm
 
+.PHONY: smoke
+
 RESYNTHESIS=slt_arctic_a0010.resynth.wav bdl_arctic_a0020.resynth.wav clb_arctic_a0030.resynth.wav awb_arctic_a0040.resynth.wav
 
 all:
 	$(MAKE) samples.scp
+	$(MAKE) smoke
 	$(MAKE) ${RESYNTHESIS}
 
 samples.scp:
@@ -49,6 +55,29 @@ samples.scp:
 	ls *.wav |grep -v '.resynth.wav' > samples.scp
 
 
+smoke: samples.scp
+	# Use just one example
+	cp awb_arctic_a0040.wav smoke.wav
+	cp awb_arctic_a0040.f0.txt smoke.f0.txt
+	python ../analysis.py smoke.wav --inf0txt smoke.f0.txt
+	python ../analysis.py smoke.wav --inf0txt smoke.f0.txt --f0 smoke.f0
+	python ../analysis.py smoke.wav --inf0txt smoke.f0.txt --f0 smoke.logf0 --f0_log
+	python ../analysis.py smoke.wav --inf0txt smoke.f0.txt --spec smoke.spec
+	python ../analysis.py smoke.wav --inf0txt smoke.f0.txt --pdd smoke.pdd
+	python ../analysis.py smoke.wav --inf0txt smoke.f0.txt --nm smoke.nm
+	python ../analysis.py smoke.wav --inf0txt smoke.f0.txt --nm smoke.bndnm --nm_nbbnds 25
+	python ../synthesis.py smoke.resynth.wav --fs 16000 --f0file smoke.f0 --spec smoke.spec
+	python ../synthesis.py smoke.resynth.wav --fs 16000 --logf0file smoke.logf0 --spec smoke.spec
+	python ../synthesis.py smoke.resynth.wav --fs 16000 --f0file smoke.f0 --specfile smoke.spec --pddfile smoke.pdd
+	python ../synthesis.py smoke.resynth.wav --fs 16000 --f0file smoke.f0 --specfile smoke.spec --nmfile smoke.nm
+	python ../synthesis.py smoke.resynth.wav --fs 16000 --f0file smoke.f0 --specfile smoke.spec --bndnmfile smoke.bndnm
+
+smoke_mcp:
+	python ../analysis.py smoke.wav --inf0txt smoke.f0.txt --spec smoke.mcep --spec_order 59
+	python ../analysis.py smoke.wav --inf0txt smoke.f0.txt --pdd smoke.mpdd --spec_order 59
+	python ../synthesis.py smoke.resynth.wav --fs 16000 --f0file smoke.f0 --mcepfile smoke.mcep
+	python ../synthesis.py smoke.resynth.wav --fs 16000 --f0file smoke.f0 --specfile smoke.spec --mpddfile smoke.mpdd
+	
 # Analysis ---------------------------------------------------------------------
 
 %.f0 %.spec %.pdd: %.wav %.f0.txt ../analysis.py
@@ -81,10 +110,10 @@ samples.scp:
 # 	@python ../synthesis.py $@ --f0file $< --specfile $(<:.f0=.spec) --noisemaskfile $(<:.f0=.bndnm) --noisemask_nbbnds 21 --fs 16000
 
 clean:
-	rm -f *.resynth.wav *.f0 *.spec *.pdd *.nm *.bndnm *.diff
+	rm -f *.resynth.wav *.f0 *.logf0 *.spec *.pdd *.mpdd *.nm *.bndnm *.diff
 
 distclean:
-	rm -f samples.scp *.wav *.f0 *.spec *.pdd *.nm *.bndnm *.diff
+	rm -f samples.scp *.wav *.f0 *.logf0 *.spec *.pdd *.mpdd *.nm *.bndnm *.diff
 
 	
 # For debugging purpose --------------------------------------------------------

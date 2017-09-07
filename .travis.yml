@@ -20,6 +20,9 @@ before_install:
     - echo $TRAVIS_TAG
     - export TRAVIS_TAG=`git describe --tags --exact-match HEAD 2>/dev/null`
     - echo $TRAVIS_TAG
+    
+    - sudo apt-get -qq update
+    - sudo apt-get install -y cython python-numpy python-scipy
 
 install:
     - echo "install..."
@@ -35,10 +38,19 @@ script:
     - echo $PROJECTGITVERSION > ../pulsemodel_source_build/Version
     - rm -fr ../pulsemodel_source_build/.git*
     - rm -fr ../pulsemodel_source_build/sigproc/.git*
-    - mv ../pulsemodel_source_build pulsemodel
+    - rm -fr ../pulsemodel_source_build/external/pyworld/.git*
+    - rm -fr ../pulsemodel_source_build/external/pyworld/lib/World/.git*
+    - cp -fr ../pulsemodel_source_build pulsemodel
+
+    - cp -fr ../pulsemodel_source_build pulsemodel_test
+    - cd pulsemodel_test
+    - make test
+    - cd ..
+
     - zip -r $PACKAGENAME pulsemodel
     - ls
     - ls -l $PACKAGENAME
+
 
 deploy:
   skip_cleanup: true
