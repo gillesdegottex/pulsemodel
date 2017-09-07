@@ -8,14 +8,14 @@ build: build_sigproc build_pyworld
 
 
 sigproc/sinusoidal.pyx:
-	git submodule update --init
+	git submodule update --init --recursive
 
 build_sigproc: sigproc/sinusoidal.pyx
 	cd sigproc; $(MAKE)
 
 
 external/pyworld/lib/World:
-	git submodule update --init
+	git submodule update --init --recursive
 
 build_pyworld: external/pyworld/lib/World
 	cd external/pyworld; python setup.py build_ext --inplace
