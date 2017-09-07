@@ -50,17 +50,18 @@ def analysis_f0postproc(wav, fs, f0s, f0_min=60, f0_max=600,
     if f0s is None:
         f0s = sigproc.interfaces.reaper(wav, fs, shift, f0_min, f0_max)
 
+    # If only values are given, make two column matrix [time[s], value[Hz]] (ljuvela)
+    if len(f0s.shape)==1:
+        ts = (shift)*np.arange(len(f0s))
+        f0s = np.vstack((ts, f0s)).T
+        
     if not (f0s[:,1]>0).any():
         warnings.warn('''\n\nWARNING: No F0 value can be estimated in this signal.
          It will be replaced by the constant f0_min value ({}Hz).
         '''.format(f0_min), RuntimeWarning)
         f0s[:,1] = f0_min
 
-    # Make two column matrix [ time[s], value[Hz] ]
-    if len(f0s.shape)==1:
-        ts = (shift)*np.arange(len(f0s))
-        f0s = np.vstack((ts, f0s)).T
-
+        
     # Build the continuous f0
     f0s[:,1] = np.interp(f0s[:,0], f0s[f0s[:,1]>0,0], f0s[f0s[:,1]>0,1])
      # Avoid erratic values outside of the given interval
@@ -256,6 +257,7 @@ def analysisf(fwav,
         shift=0.005,
         dftlen=4096,
         inf0txt_file=None, f0_min=60, f0_max=600, f0_file=None, f0_log=False,
+        inf0bin_file=None, # input f0 file in binary
         spec_file=None, spec_order=None, # Mel-cepstral order for compressing the 
                                 # spectrum (typically 59; None: no compression)
         pdd_file=None, pdd_order=None,   # Mel-cepstral order for compressing PDD
@@ -271,6 +273,10 @@ def analysisf(fwav,
     f0s = None
     if inf0txt_file:
         f0s = np.loadtxt(inf0txt_file)
+        
+    # read input f0 file in float32 (ljuvela)    
+    if inf0bin_file:
+        f0s = np.fromfile(inf0bin_file, dtype=np.float32)        
 
     f0s = analysis_f0postproc(wav, fs, f0s, f0_min=f0_min, f0_max=f0_max, shift=shift, verbose=verbose)
 
@@ -319,6 +325,7 @@ if  __name__ == "__main__" :
     argpar.add_argument("--shift", default=0.005, type=float, help="time step[s] between the input frames (def. 0.005s)")
     argpar.add_argument("--dftlen", default=4096, type=float, help="Number of bins in the DFT (def. 4096)")
     argpar.add_argument("--inf0txt", default=None, help="Given f0 file")
+    argpar.add_argument("--inf0bin", default=None, help="Given f0 file (single precision float binary)")
     argpar.add_argument("--f0_min", default=60, type=float, help="Minimal possible f0[Hz] value (def. 60Hz)")
     argpar.add_argument("--f0_max", default=600, type=float, help="Maximal possible f0[Hz] value (def. 600Hz)")
     argpar.add_argument("--f0", default=None, help="Output f0 file")
@@ -336,6 +343,7 @@ if  __name__ == "__main__" :
               shift=args.shift,
               dftlen=args.dftlen,
               inf0txt_file=args.inf0txt, f0_min=args.f0_min, f0_max=args.f0_max, f0_file=args.f0, f0_log=args.f0_log,
+              inf0bin_file=args.inf0bin,
               spec_file=args.spec, spec_order=args.spec_order,
               pdd_file=args.pdd, pdd_order=args.pdd_order,
               nm_file=args.nm, nm_nbbnds=args.nm_nbbnds,
