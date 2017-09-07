@@ -81,15 +81,15 @@ smoke_mcp:
 
 # Analysis ---------------------------------------------------------------------
 
-%.f0 %.spec %.pdd: %.wav %.f0.txt ../analysis.py
+%.f0 %.spec %.pdd: %.wav ../analysis.py
 	@python ../analysis.py $< --f0 $(<:.wav=.f0) --spec $(<:.wav=.spec) --pdd $(<:.wav=.pdd)
 
 # # You can use this rule if you want to skip PDD and use the noisemask
-# %.f0 %.spec %.nm: %.wav %.f0.txt ../analysis.py
+# %.f0 %.spec %.nm: %.wav ../analysis.py
 # 	python ../analysis.py $< --inf0txt $(<:.wav=.f0.txt) --f0 $(<:.wav=.f0) --spec $(<:.wav=.spec) --nm $(<:.wav=.nm)
 # 
 # # Or this rule if you also want to compress the noisemask in mel bands
-# %.f0 %.spec %.bndnm: %.wav %.f0.txt ../analysis.py
+# %.f0 %.spec %.bndnm: %.wav ../analysis.py
 # 	@python ../analysis.py $< --inf0txt $(<:.wav=.f0.txt) --f0 $(<:.wav=.f0) --spec $(<:.wav=.spec) --nm $(<:.wav=.bndnm) --nm_nbbnds 21
 
 # # If you have REAPER F0 estimator installed, you can also generate the f0 directly:
