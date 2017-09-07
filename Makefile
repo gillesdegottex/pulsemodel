@@ -1,13 +1,13 @@
 .PHONY: build submodule_init build_sigproc build_pyworld
 
 
-all: sigproc/sinusoidal.pyx build
+all: build
 
 submodule_init:
 	git submodule update --init --recursive
 
-build: submodule_init build_sigproc build_pyworld
 
+build: submodule_init build_sigproc build_pyworld
 
 build_sigproc: submodule_init
 	cd sigproc; $(MAKE)
