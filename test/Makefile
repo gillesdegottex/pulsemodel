@@ -56,17 +56,17 @@ samples.scp:
 
 
 smoke: samples.scp
-        # Use just one example
+	# Use just one example
 	cp awb_arctic_a0040.wav smoke.wav
 	cp awb_arctic_a0040.f0.txt smoke.f0.txt
-	python ../analysis.py smoke.wav --inf0txt smoke.f0.txt
-	python ../analysis.py smoke.wav --inf0txt smoke.f0.txt --f0 smoke.f0
-	python ../analysis.py smoke.wav --inf0txt smoke.f0.txt --f0 smoke.logf0 --f0_log
-	python ../analysis.py smoke.wav --inf0txt smoke.f0.txt --spec smoke.spec
-	python ../analysis.py smoke.wav --inf0txt smoke.f0.txt --pdd smoke.pdd
-	python ../analysis.py smoke.wav --inf0txt smoke.f0.txt --nm smoke.nm
-	python ../analysis.py smoke.wav --inf0txt smoke.f0.txt --nm smoke.bndnm --nm_nbbnds 25
-        # use sptk style binary input F0
+	python ../analysis.py smoke.wav 
+	python ../analysis.py smoke.wav --f0 smoke.f0
+	python ../analysis.py smoke.wav --f0 smoke.logf0 --f0_log
+	python ../analysis.py smoke.wav --spec smoke.spec
+	python ../analysis.py smoke.wav --pdd smoke.pdd
+	python ../analysis.py smoke.wav --nm smoke.nm
+	python ../analysis.py smoke.wav --nm smoke.bndnm --nm_nbbnds 25
+	# use sptk style binary input F0
 	python ../analysis.py smoke.wav --inf0bin smoke.f0 --nm smoke.bndnm --nm_nbbnds 25		
 	python ../synthesis.py smoke.resynth.wav --fs 16000 --f0file smoke.f0 --spec smoke.spec
 	python ../synthesis.py smoke.resynth.wav --fs 16000 --logf0file smoke.logf0 --spec smoke.spec
@@ -75,15 +75,15 @@ smoke: samples.scp
 	python ../synthesis.py smoke.resynth.wav --fs 16000 --f0file smoke.f0 --specfile smoke.spec --bndnmfile smoke.bndnm
 
 smoke_mcp:
-	python ../analysis.py smoke.wav --inf0txt smoke.f0.txt --spec smoke.mcep --spec_order 59
-	python ../analysis.py smoke.wav --inf0txt smoke.f0.txt --pdd smoke.mpdd --spec_order 59
+	python ../analysis.py smoke.wav --spec smoke.mcep --spec_order 59
+	python ../analysis.py smoke.wav --pdd smoke.mpdd --spec_order 59
 	python ../synthesis.py smoke.resynth.wav --fs 16000 --f0file smoke.f0 --mcepfile smoke.mcep
 	python ../synthesis.py smoke.resynth.wav --fs 16000 --f0file smoke.f0 --specfile smoke.spec --mpddfile smoke.mpdd
 
 # Analysis ---------------------------------------------------------------------
 
 %.f0 %.spec %.pdd: %.wav %.f0.txt ../analysis.py
-	@python ../analysis.py $< --inf0txt $(<:.wav=.f0.txt) --f0 $(<:.wav=.f0) --spec $(<:.wav=.spec) --pdd $(<:.wav=.pdd)
+	@python ../analysis.py $< --f0 $(<:.wav=.f0) --spec $(<:.wav=.spec) --pdd $(<:.wav=.pdd)
 
 # # You can use this rule if you want to skip PDD and use the noisemask
 # %.f0 %.spec %.nm: %.wav %.f0.txt ../analysis.py
