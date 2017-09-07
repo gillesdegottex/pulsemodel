@@ -1,26 +1,24 @@
-.PHONY: build build_sigproc build_pyworld
+.PHONY: build submodule_init build_sigproc build_pyworld
 
 
 all: sigproc/sinusoidal.pyx build
 
-
-build: build_sigproc build_pyworld
-
-
-sigproc/sinusoidal.pyx:
+submodule_init:
 	git submodule update --init --recursive
 
-build_sigproc: sigproc/sinusoidal.pyx
+build: submodule_init build_sigproc build_pyworld
+
+
+build_sigproc: submodule_init
 	cd sigproc; $(MAKE)
 
+build_reaper: submodule_init
+	cd external/REAPER; mkdir build; cd build; cmake ..; make
 
-external/pyworld/lib/World:
-	git submodule update --init --recursive
-
-build_pyworld: external/pyworld/lib/World
+build_pyworld: submodule_init
 	cd external/pyworld; python setup.py build_ext --inplace
 
-	
+
 test: build
 	cd test; $(MAKE)
 

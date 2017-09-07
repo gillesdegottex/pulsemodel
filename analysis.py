@@ -40,6 +40,11 @@ import sigproc as sp
 import sigproc.pystraight
 import sigproc.interfaces
 
+# Add the path for REAPER f0 estimator
+os.environ["PATH"] += os.pathsep + os.path.join(os.path.split(os.path.realpath(__file__))[0],'external/REAPER/build')
+# Add the path for WORLD vocoder's amplitude spectral envelope estimator
+sys.path.insert(0, os.path.join(os.path.split(os.path.realpath(__file__))[0],'external/pyworld/pyworld'))
+
 def analysis_f0postproc(wav, fs, f0s, f0_min=60, f0_max=600,
              shift=0.005,        # Usually 5ms
              verbose=1):
@@ -81,9 +86,6 @@ def analysis_spec(wav, fs, f0s,
     '''
     Estimate the amplitude spectral envelope.
     '''
-
-    # Add the potential path for WORLD vocoder
-    sys.path.insert(0, os.path.join(os.path.split(os.path.realpath(__file__))[0],'external/pyworld/pyworld'))
 
     if sp.pystraight.isanalysiseavailable():
         # Use STRAIGHT's envelope if available (as in PML's publications)
