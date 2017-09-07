@@ -33,7 +33,7 @@ In order to make it a standalone vocoder, it was thus necessary to import an F0 
 
 #### For F0
 For F0, a modified version of REAPER is used:
-> https://github.com/google/REAPER
+> https://github.com/gillesdegottex/REAPER
 
 However, the modifications made to the original REAPER do NOT change the f0 estimation.
 They are only made for an easier interface with PML code.
