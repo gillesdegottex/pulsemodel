@@ -27,18 +27,20 @@ Author: Gilles Degottex <gad27@cam.ac.uk>
 ### External tools
 PML first aims at extracting a noise measure and synthesis a waveform assuming F0 curve and amplitude spectral envelopes are already given.
 
-In order to make it a standalone vocoder, it was thus necessary to import an F0 estimator and an spectral envelope estimator.
+In order to make it a standalone vocoder, it was thus necessary to import an F0 estimator and a spectral envelope estimator.
 
+#### For F0
 For F0, a modified version of REAPER is used (github.com/google/REAPER).
-    However, the modifications made to the original REAPER do NOT change the f0 estimation.
-    They are only made for an easier interface with PML code.
-    You can have a look at the modifications here:
+However, the modifications made to the original REAPER do NOT change the f0 estimation.
+They are only made for an easier interface with PML code.
+You can have a look at the modifications here:
     https://github.com/google/REAPER/compare/master...gillesdegottex:master
 
-For the amplitude spectral envelope, the estimator CheapTrick is used (from the WORLD vocoder, without any modification).
+#### For the amplitude spectral envelope
+For the amplitude spectral envelope, the estimator CheapTrick is used (from the WORLD vocoder, without any modification):
 
-    Masanori Morise, CheapTrick, a spectral envelope estimator for high-quality speech synthesis, Speech Communication, Volume 67, 2015, Pages 1-7, ISSN 0167-6393, http://dx.doi.org/10.1016/j.specom.2014.09.003.
+> Masanori Morise, CheapTrick, a spectral envelope estimator for high-quality speech synthesis, Speech Communication, Volume 67, 2015, Pages 1-7, ISSN 0167-6393, http://dx.doi.org/10.1016/j.specom.2014.09.003.
 
-    Note that all the published results about PML have been done using the spectral envelope of the STRAIGHT vocoder, NOT using WORLD.
-    Because of legal reason it is not possible to release any of STRAIGHT vocoder analysis. Thus, the use of CheapTrick instead in this repository.
-    It also means that, even though STRAIGHT's envelope and CheapTrick are quite similar, you might observe small differences in results between the two.
+Note that all the published results about PML have been done using the spectral envelope of the STRAIGHT vocoder, NOT using WORLD.
+Because of legal reason it is not possible to release any of STRAIGHT vocoder analysis. Thus, the use of CheapTrick instead in this repository.
+It also means that, even though STRAIGHT's envelope and CheapTrick are quite similar, you might observe small differences in results between the two.
