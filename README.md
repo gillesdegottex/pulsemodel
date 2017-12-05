@@ -32,13 +32,8 @@ PML first aims at extracting a noise measure and synthesis a waveform assuming F
 In order to make it a standalone vocoder, it was thus necessary to import an F0 estimator and a spectral envelope estimator.
 
 #### For F0
-For F0, a modified version of REAPER is used:
+For F0, REAPER is used:
 > https://github.com/gillesdegottex/REAPER
-
-However, the modifications made to the original REAPER do NOT change the f0 estimation.
-They are only made for an easier interface with PML code.
-You can have a look at the modifications here:
-> https://github.com/google/REAPER/compare/master...gillesdegottex:master
 
 #### For the amplitude spectral envelope
 For the amplitude spectral envelope, the estimator CheapTrick is used:
