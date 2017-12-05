@@ -1,10 +1,6 @@
 ## Pulse model analysis and synthesis
 
 It is basically the vocoder described in:
-> G. Degottex, P. Lanchantin, and M. Gales, "A Pulse Model in Log-domain
->    for a Uniform Synthesizer," in Proc. 9th Speech Synthesis Workshop
->    (SSW9), 2016.
-
 > G. Degottex, P. Lanchantin and M. Gales, "A Log Domain Pulse Model for Parametric
 >    Speech Synthesis", IEEE Transactions on Audio, Speech, and Language Processing,
 >    26(1):57-70, 2018.
