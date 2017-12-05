@@ -5,6 +5,10 @@ It is basically the vocoder described in:
 >    for a Uniform Synthesizer," in Proc. 9th Speech Synthesis Workshop
 >    (SSW9), 2016.
 
+> G. Degottex, P. Lanchantin and M. Gales, "A Log Domain Pulse Model for Parametric
+>    Speech Synthesis", IEEE Transactions on Audio, Speech, and Language Processing,
+>    26(1):57-70, 2018.
+
 ### Documentation
 Please see the headers of analysis.py and synthesis.py files as well as the
 functions documentation for more details.
