@@ -120,7 +120,7 @@ def analysis_spec(wav, fs, f0s,
         ''', RuntimeWarning)
 
         SPEC = sp.multi_linear(sinsreg, fs, dftlen)
-        SPEC = np.exp(SPEC)*np.sqrt(dftlen)
+        SPEC = np.exp(SPEC)*np.sqrt(float(dftlen))
 
     return SPEC
 
