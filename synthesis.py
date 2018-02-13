@@ -166,18 +166,19 @@ def synthesize(fs, f0s, SPEC, NM=None, wavlen=None
         if verbose>1: print "\rPM Synthesis (python) t={:4.3f}s f0={:3.3f}Hz               ".format(t,f0),
 
         # Window's length
+        nbper = 4
         # TODO It should be ensured that the beggining and end of the
         #      noise is within the window. Nothing is doing this currently!
-        winlen = int(np.max((0.050*fs, 3*fs/f0))/2)*2+1 # Has to be odd
+        winlen = int(np.max((0.050*fs, nbper*fs/f0))/2)*2+1 # Has to be odd
         # TODO We also assume that the VTF's decay is shorter
-        #      than 2 periods (dangerous with high pitched tense voice).
+        #      than nbper-1 periods (dangerous with high pitched tense voice).
         if winlen>dftlen: raise ValueError('winlen({})>dftlen({})'.format(winlen, dftlen))
 
         # Set the rough position of the pulse in the window (the closest sample)
         # We keep a third of the window (1 period) on the left because the
         # pulse signal is minimum phase. And 2/3rd (remaining 2 periods)
         # on the right to let the VTF decay.
-        pulseposinwin = int(0.33*winlen)
+        pulseposinwin = int((1.0/nbper)*winlen)
 
         # The sample indices of the current pulse wrt. the final waveform
         winidx = int(round(fs*t)) + np.arange(winlen)-pulseposinwin
