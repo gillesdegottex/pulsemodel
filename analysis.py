@@ -260,12 +260,11 @@ def analysisf(fwav,
         dftlen=4096,
         inf0txt_file=None, f0_min=60, f0_max=600, f0_file=None, f0_log=False,
         inf0bin_file=None, # input f0 file in binary
-        spec_file=None, spec_order=None, # Mel-cepstral order for compressing the 
-                                # spectrum (typically 59; None: no compression)
-        pdd_file=None, pdd_order=None,   # Mel-cepstral order for compressing PDD
-                                # spectrum (typically 59; None: no compression)
-        nm_file=None, nm_nbbnds=None,  # Number of mel-bands in the compressed mask
-                                # (None: no compression)
+        spec_file=None,
+            spec_mceporder=None, # Mel-cepstral order for compressing the spectrogram (typically 59; None: no compression)
+            spec_nbfwbnds=None,  # Number of mel-bands in the compressed half log spectrogram (None: no compression)
+        pdd_file=None, pdd_mceporder=None,   # Mel-cepstral order for compressing PDD spectrogram (typically 59; None: no compression)
+        nm_file=None, nm_nbfwbnds=None,  # Number of mel-bands in the compressed noise mask (None: no compression)
         verbose=1):
 
     wav, fs, enc = sp.wavread(fwav)
@@ -291,8 +290,10 @@ def analysisf(fwav,
     SPEC = None
     if spec_file:
         SPEC = analysis_spec(wav, fs, f0s, shift=shift, dftlen=dftlen, verbose=verbose)
-        if not spec_order is None:
-            SPEC = sp.spec2mcep(SPEC, sp.bark_alpha(fs), order=spec_order)
+        if not spec_mceporder is None:
+            SPEC = sp.spec2mcep(SPEC, sp.bark_alpha(fs), order=spec_mceporder)
+        if not spec_nbfwbnds is None:
+            SPEC = sp.linbnd2fwbnd(np.log(abs(SPEC)), fs, dftlen, spec_nbfwbnds)
         if verbose>0: print('    Output Spectrogram size={} in: {}'.format(SPEC.shape, spec_file))
         SPEC.astype(np.float32).tofile(spec_file)
 
@@ -301,10 +302,10 @@ def analysisf(fwav,
         PDD = analysis_pdd(wav, fs, f0s, dftlen=dftlen, verbose=verbose)
 
     if pdd_file:
-        if not pdd_order is None:
+        if not pdd_mceporder is None:
             # If asked, compress PDD
             PDD[PDD<0.001] = 0.001 # From COVAREP
-            PDD = sp.spec2mcep(PDD, sp.bark_alpha(fs), pdd_order)
+            PDD = sp.spec2mcep(PDD, sp.bark_alpha(fs), pdd_mceporder)
         if verbose>0: print('    Output PDD size={} in: {}'.format(PDD.shape, pdd_file))
         PDD.astype(np.float32).tofile(pdd_file)
 
@@ -312,9 +313,9 @@ def analysisf(fwav,
     if nm_file:
         NM = analysis_nm(wav, fs, f0s, PDD, verbose=verbose)
         # If asked, compress NM
-        if nm_nbbnds:
+        if nm_nbfwbnds:
             # If asked, compress the noise mask using a number of mel bands
-            NM = sp.linbnd2fwbnd(NM, fs, dftlen, nm_nbbnds)
+            NM = sp.linbnd2fwbnd(NM, fs, dftlen, nm_nbfwbnds)
         if verbose>0: print('    Output Noise Mask size={} in: {}'.format(NM.shape, nm_file))
         NM.astype(np.float32).tofile(nm_file)
 
@@ -333,11 +334,12 @@ if  __name__ == "__main__" :
     argpar.add_argument("--f0", default=None, help="Output f0 file")
     argpar.add_argument("--f0_log", action='store_true', help="Output f0 file with log Hertz values instead of linear Hertz (def. False)")
     argpar.add_argument("--spec", default=None, help="Output spectrum-related file")
-    argpar.add_argument("--spec_order", default=None, help="Mel-cepstral order for the spectrogram (None:uncompressed; typically 59)")
+    argpar.add_argument("--spec_mceporder", default=None, type=int, help="Mel-cepstral order for the spectrogram (None:uncompressed; typically 59)")
+    argpar.add_argument("--spec_nbfwbnds", default=None, type=int, help="Number of mel-bands in the compressed half log spectrogram (None:uncompressed; typically 129 (should be odd size as long as full spectrum size if power of 2 (even size)")
     argpar.add_argument("--pdd", default=None, help="Output Phase Distortion Deviation (PDD) file")
     argpar.add_argument("--pdd_mceporder", default=None, type=int, help="Cepstral order for PDD (None:uncompressed; typically 59)")
     argpar.add_argument("--nm", default=None, help="Output noise mask (for PML vocoder)")
-    argpar.add_argument("--nm_nbbnds", default=None, type=int, help="Number of mel-bands in the compressed noise mask (None:uncompressed; typically 25)")
+    argpar.add_argument("--nm_nbfwbnds", default=None, type=int, help="Number of mel-bands in the compressed noise mask (None:uncompressed; typically 33)")
     argpar.add_argument("--verbose", default=1, type=int, help="Output some information")
     args = argpar.parse_args()
 
@@ -346,7 +348,7 @@ if  __name__ == "__main__" :
               dftlen=args.dftlen,
               inf0txt_file=args.inf0txt, f0_min=args.f0_min, f0_max=args.f0_max, f0_file=args.f0, f0_log=args.f0_log,
               inf0bin_file=args.inf0bin,
-              spec_file=args.spec, spec_order=args.spec_order,
-              pdd_file=args.pdd, pdd_order=args.pdd_order,
-              nm_file=args.nm, nm_nbbnds=args.nm_nbbnds,
+              spec_file=args.spec, spec_mceporder=args.spec_mceporder, spec_nbfwbnds=args.spec_nbfwbnds,
+              pdd_file=args.pdd, pdd_mceporder=args.pdd_mceporder,
+              nm_file=args.nm, nm_nbfwbnds=args.nm_nbfwbnds,
               verbose=args.verbose)
