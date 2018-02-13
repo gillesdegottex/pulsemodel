@@ -55,10 +55,11 @@ def synthesize(fs, f0s, SPEC, NM=None, wavlen=None
                 , f0s_rmsteps=False # Removes steps in the f0 curve
                                     # (see sigproc.resampling.f0s_rmsteps(.) )
                 , ener_multT0=False
-                , nm_cont=False
+                , nm_cont=False     # If False, force binary state of the noise mask (by thresholding at 0.5)
                 , nm_lowpasswinlen=9
-                , hp_f0coef=0.5 # factor of f0 for the cut-off of the high-pass filter (def. 0.5*f0)
-                , antipreechohwindur=0.001 # [s]
+                , hp_f0coef=0.5     # factor of f0 for the cut-off of the high-pass filter (def. 0.5*f0)
+                , antipreechohwindur=0.001 # [s] Use to damp the signal at the beginning of the signal AND at the end of it
+                # Following options are for post-processing the features, after the generation/transformation and thus before waveform synthesis
                 , pp_atten1stharminsilences=None # Typical value is -25
                 , verbose=1):
 
@@ -77,7 +78,7 @@ def synthesize(fs, f0s, SPEC, NM=None, wavlen=None
             raise ValueError('spectrogram size {} and NM size {} do not match.'.format(SPEC.shape, NM.shape))
 
     if wavlen==None: wavlen = int(np.round(f0s[-1,0]*fs))
-    dftlen = (SPEC.shape[1]-1)*2   
+    dftlen = (SPEC.shape[1]-1)*2
     shift = np.median(np.diff(f0s[:,0]))
     if verbose>0:
         print('PM Synthesis (dur={}s, fs={}Hz, f0 in [{:.0f},{:.0f}]Hz, shift={}s, dftlen={})'.format(wavlen/float(fs), fs, np.min(f0s[:,1]), np.max(f0s[:,1]), shift, dftlen))
@@ -199,7 +200,7 @@ def synthesize(fs, f0s, SPEC, NM=None, wavlen=None
         # STRAIGHT and AHOCODER vocoders do it.
         # (why ? to equalize the energy when changing the pulse's duration ?)
         if ener_multT0:
-            S *= np.sqrt(fs/f0) 
+            S *= np.sqrt(fs/f0)
 
         # Generate the segment of Gaussian noise
         # Use mid-points before/after pulse position
