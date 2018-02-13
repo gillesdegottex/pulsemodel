@@ -8,7 +8,7 @@ References
     [2] G. Degottex and D. Erro, "A uniform phase representation for the
         harmonic model in speech synthesis applications," EURASIP, Journal on
         Audio, Speech, and Music Processing - Special Issue: Models of Speech -
-        In Search of Better Representations, vol. 2014, iss. 1, p. 38, 2014. 
+        In Search of Better Representations, vol. 2014, iss. 1, p. 38, 2014.
 
 Copyright(C) 2016 Engineering Department, University of Cambridge, UK.
 
