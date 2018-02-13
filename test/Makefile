@@ -1,5 +1,5 @@
 # Run analysis/re-synthesis (copy-synthesis) on some samples
-# 
+#
 # Description
 #   * To run all the tests, you need the following executable:
 #     reaper (https://github.com/google/REAPER)
@@ -14,25 +14,25 @@
 #     If REAPER F0 estimator is installed (https://github.com/google/REAPER)
 #     , you can also generate the f0 using the analysis.py script directly
 #     (see below for the rule commented).
-# 
+#
 # Usage
-# 	$ make 
-# 
+# 	$ make
+#
 # Copyright(C) 2016 Engineering Department, University of Cambridge, UK.
-# 
+#
 # License
 #    Licensed under the Apache License, Version 2.0 (the "License");
 #    you may not use this file except in compliance with the License.
 #    You may obtain a copy of the License at
-# 
+#
 #      http://www.apache.org/licenses/LICENSE-2.0
-# 
+#
 #    Unless required by applicable law or agreed to in writing, software
 #    distributed under the License is distributed on an "AS IS" BASIS,
 #    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
-# 
+#
 # Author
 #     Gilles Degottex <gad27@cam.ac.uk>
 
@@ -58,15 +58,15 @@ samples.scp:
 smoke: samples.scp
 	# Use just one example
 	cp awb_arctic_a0040.wav smoke.wav
-	python ../analysis.py smoke.wav 
+	python ../analysis.py smoke.wav
 	python ../analysis.py smoke.wav --f0 smoke.f0
 	python ../analysis.py smoke.wav --f0 smoke.logf0 --f0_log
 	python ../analysis.py smoke.wav --spec smoke.spec
 	python ../analysis.py smoke.wav --pdd smoke.pdd
 	python ../analysis.py smoke.wav --nm smoke.nm
-	python ../analysis.py smoke.wav --nm smoke.bndnm --nm_nbbnds 25
+	python ../analysis.py smoke.wav --nm smoke.bndnm --nm_nbfwbnds 25
 	# use sptk style binary input F0
-	python ../analysis.py smoke.wav --inf0bin smoke.f0 --nm smoke.bndnm --nm_nbbnds 25		
+	python ../analysis.py smoke.wav --inf0bin smoke.f0 --nm smoke.bndnm --nm_nbfwbnds 25
 	python ../synthesis.py smoke.resynth.wav --fs 16000 --f0file smoke.f0 --spec smoke.spec
 	python ../synthesis.py smoke.resynth.wav --fs 16000 --logf0file smoke.logf0 --spec smoke.spec
 	python ../synthesis.py smoke.resynth.wav --fs 16000 --f0file smoke.f0 --specfile smoke.spec --pddfile smoke.pdd
@@ -87,10 +87,10 @@ smoke_mcp:
 # # You can use this rule if you want to skip PDD and use the noisemask
 # %.f0 %.spec %.nm: %.wav ../analysis.py
 # 	python ../analysis.py $< --inf0txt $(<:.wav=.f0.txt) --f0 $(<:.wav=.f0) --spec $(<:.wav=.spec) --nm $(<:.wav=.nm)
-# 
+#
 # # Or this rule if you also want to compress the noisemask in mel bands
 # %.f0 %.spec %.bndnm: %.wav ../analysis.py
-# 	@python ../analysis.py $< --inf0txt $(<:.wav=.f0.txt) --f0 $(<:.wav=.f0) --spec $(<:.wav=.spec) --nm $(<:.wav=.bndnm) --nm_nbbnds 21
+# 	@python ../analysis.py $< --inf0txt $(<:.wav=.f0.txt) --f0 $(<:.wav=.f0) --spec $(<:.wav=.spec) --nm $(<:.wav=.bndnm) --nm_nbfwbnds 21
 
 # # If you have REAPER F0 estimator installed, you can also generate the f0 directly:
 # %.f0 %.spec %.pdd: %.wav ../analysis.py
