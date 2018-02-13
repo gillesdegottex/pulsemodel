@@ -74,10 +74,16 @@ smoke: samples.scp
 	python ../synthesis.py smoke.resynth.wav --fs 16000 --f0file smoke.f0 --specfile smoke.spec --bndnmfile smoke.bndnm
 
 smoke_mcp:
-	python ../analysis.py smoke.wav --spec smoke.mcep --spec_order 59
-	python ../analysis.py smoke.wav --pdd smoke.mpdd --spec_order 59
+	python ../analysis.py smoke.wav --spec smoke.mcep --spec_mceporder 59
+	python ../analysis.py smoke.wav --pdd smoke.mpdd --spec_mceporder 59
 	python ../synthesis.py smoke.resynth.wav --fs 16000 --f0file smoke.f0 --mcepfile smoke.mcep
 	python ../synthesis.py smoke.resynth.wav --fs 16000 --f0file smoke.f0 --specfile smoke.spec --mpddfile smoke.mpdd
+
+smoke_nbfwbnds:
+	python ../analysis.py smoke.wav --spec smoke.fwspec --spec_nbfwbnds 129
+	python ../analysis.py smoke.wav --nm smoke.fwnm --nm_nbfwbnds 33
+	# python ../synthesis.py smoke.resynth.wav --fs 16000 --f0file smoke.f0 --mcepfile smoke.fwspec # TODO
+	# python ../synthesis.py smoke.resynth.wav --fs 16000 --f0file smoke.f0 --specfile smoke.spec --mpddfile smoke.mpdd # TODO
 
 # Analysis ---------------------------------------------------------------------
 
@@ -104,11 +110,11 @@ smoke_mcp:
 
 # # You can use this rule if you want to skip PDD and use the noisemask
 # %.resynth.wav: %.f0 %.spec %.nm ../synthesis.py
-# 	@python ../synthesis.py $@ --f0file $< --specfile $(<:.f0=.spec) --noisemaskfile $(<:.f0=.nm) --fs 16000
+# 	@python ../synthesis.py $@ --f0file $< --specfile $(<:.f0=.spec) --noisemaskfile $(<:.f0=.nm) --fs 16000 # TODO
 
 # # Or this rule if you also want to compress the noisemask in mel bands
 # %.resynth.wav: %.f0 %.spec %.bndnm ../synthesis.py
-# 	@python ../synthesis.py $@ --f0file $< --specfile $(<:.f0=.spec) --noisemaskfile $(<:.f0=.bndnm) --noisemask_nbbnds 21 --fs 16000
+# 	@python ../synthesis.py $@ --f0file $< --specfile $(<:.f0=.spec) --noisemaskfile $(<:.f0=.bndnm) --noisemask_nbbnds 21 --fs 16000 # TODO
 
 clean:
 	rm -f *.resynth.wav *.f0 *.logf0 *.spec *.pdd *.mpdd *.nm *.bndnm *.diff
