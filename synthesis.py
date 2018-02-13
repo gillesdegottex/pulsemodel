@@ -60,6 +60,7 @@ def synthesize(fs, f0s, SPEC, NM=None, wavlen=None
                 # Following options are for post-processing the features, after the generation/transformation and thus before waveform synthesis
                 , pp_f0_rmsteps=False # Removes steps in the f0 curve
                                       # (see sigproc.resampling.f0s_rmsteps(.) )
+                , pp_f0_smooth=None   # Smooth the f0 curve using median and FIR filters of given window duration [s]
                 , pp_atten1stharminsilences=None # Typical value is -25
                 , verbose=1):
 
@@ -91,6 +92,17 @@ def synthesize(fs, f0s, SPEC, NM=None, wavlen=None
     # If asked, removes steps in the f0 curve
     if pp_f0_rmsteps:
         f0s = sp.f0s_rmsteps(f0s)
+    # If asked, smooth the f0 curve using median and FIR filters
+    if not pp_f0_smooth is None:
+        print('    Smoothing f0 curve using {}[s] window'.format(pp_f0_smooth))
+        import scipy.signal as sig
+        lf0 = np.log(f0s[:,1])
+        bcoefslen = int(0.5*pp_f0_smooth/shift)*2+1
+        lf0 = sig.medfilt(lf0, bcoefslen)
+        bcoefs = np.hamming(bcoefslen)
+        bcoefs = bcoefs/sum(bcoefs)
+        lf0 = sig.filtfilt(bcoefs, [1], lf0)
+        f0s[:,1] = np.exp(lf0)
 
     if not NM is None:
         # Remove noise below f0, as it is supposed to be already the case
