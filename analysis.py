@@ -59,14 +59,14 @@ def analysis_f0postproc(wav, fs, f0s, f0_min=60, f0_max=600,
     if len(f0s.shape)==1:
         ts = (shift)*np.arange(len(f0s))
         f0s = np.vstack((ts, f0s)).T
-        
+
     if not (f0s[:,1]>0).any():
         warnings.warn('''\n\nWARNING: No F0 value can be estimated in this signal.
          It will be replaced by the constant f0_min value ({}Hz).
         '''.format(f0_min), RuntimeWarning)
         f0s[:,1] = f0_min
 
-        
+
     # Build the continuous f0
     f0s[:,1] = np.interp(f0s[:,0], f0s[f0s[:,1]>0,0], f0s[f0s[:,1]>0,1])
      # Avoid erratic values outside of the given interval
@@ -200,7 +200,7 @@ def analysis(wav, fs, f0s=None, f0_min=60, f0_max=600,
     if verbose>0: print('PM Analysis (dur={:.3f}s, fs={}Hz, f0 in [{},{}]Hz, shift={}s, dftlen={})'.format(len(wav)/float(fs), fs, f0_min, f0_max, shift, dftlen))
 
     f0s = analysis_f0postproc(wav, fs, f0s, f0_min=f0_min, f0_max=f0_max, shift=shift, verbose=verbose)
-    
+
     SPEC = analysis_spec(wav, fs, f0s, shift=shift, dftlen=dftlen, verbose=verbose)
 
     PDD = analysis_pdd(wav, fs, f0s, dftlen=dftlen, verbose=verbose)
