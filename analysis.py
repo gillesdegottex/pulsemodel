@@ -338,7 +338,7 @@ if  __name__ == "__main__" :
     argpar.add_argument("--pdd_mceporder", default=None, type=int, help="Cepstral order for PDD (None:uncompressed; typically 59)")
     argpar.add_argument("--nm", default=None, help="Output noise mask (for PML vocoder)")
     argpar.add_argument("--nm_nbbnds", default=None, type=int, help="Number of mel-bands in the compressed noise mask (None:uncompressed; typically 25)")
-    argpar.add_argument("--verbose", default=1, help="Output some information")
+    argpar.add_argument("--verbose", default=1, type=int, help="Output some information")
     args = argpar.parse_args()
 
     analysisf(args.wavfile,
