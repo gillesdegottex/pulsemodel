@@ -275,10 +275,10 @@ def analysisf(fwav,
     f0s = None
     if inf0txt_file:
         f0s = np.loadtxt(inf0txt_file)
-        
-    # read input f0 file in float32 (ljuvela)    
+
+    # read input f0 file in float32 (ljuvela)
     if inf0bin_file:
-        f0s = np.fromfile(inf0bin_file, dtype=np.float32)        
+        f0s = np.fromfile(inf0bin_file, dtype=np.float32)
 
     f0s = analysis_f0postproc(wav, fs, f0s, f0_min=f0_min, f0_max=f0_max, shift=shift, verbose=verbose)
 
