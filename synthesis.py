@@ -244,6 +244,10 @@ def synthesize(fs, f0s, SPEC, NM=None, wavlen=None
         deter[:leftbnd-winidx[0]-len(dampinhwin)] = 0.0
         deter[leftbnd-winidx[0]-len(dampinhwin):leftbnd-winidx[0]] *= dampinhwin
 
+        # Add half window on the right
+        # to avoid cutting the VTF response abruptly
+        deter[-len(dampinhwin):] *= dampinhwin[::-1]
+
         # Write the synthesized segment in the final waveform
         if winidx[0]<0 or winidx[-1]>=wavlen:
             # The window is partly outside of the waveform ...
