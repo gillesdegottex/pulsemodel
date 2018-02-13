@@ -52,14 +52,14 @@ import scipy
 import sigproc as sp
 
 def synthesize(fs, f0s, SPEC, NM=None, wavlen=None
-                , f0s_rmsteps=False # Removes steps in the f0 curve
-                                    # (see sigproc.resampling.f0s_rmsteps(.) )
                 , ener_multT0=False
                 , nm_cont=False     # If False, force binary state of the noise mask (by thresholding at 0.5)
                 , nm_lowpasswinlen=9
                 , hp_f0coef=0.5     # factor of f0 for the cut-off of the high-pass filter (def. 0.5*f0)
                 , antipreechohwindur=0.001 # [s] Use to damp the signal at the beginning of the signal AND at the end of it
                 # Following options are for post-processing the features, after the generation/transformation and thus before waveform synthesis
+                , pp_f0_rmsteps=False # Removes steps in the f0 curve
+                                      # (see sigproc.resampling.f0s_rmsteps(.) )
                 , pp_atten1stharminsilences=None # Typical value is -25
                 , verbose=1):
 
@@ -89,7 +89,7 @@ def synthesize(fs, f0s, SPEC, NM=None, wavlen=None
     # Enforce continuous f0
     f0s[:,1] = np.interp(f0s[:,0], f0s[f0s[:,1]>0,0], f0s[f0s[:,1]>0,1])
     # If asked, removes steps in the f0 curve
-    if f0s_rmsteps:
+    if pp_f0_rmsteps:
         f0s = sp.f0s_rmsteps(f0s)
 
     if not NM is None:
