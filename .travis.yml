@@ -1,4 +1,4 @@
-language: pyhton
+language: python
 
 os:
     - linux
