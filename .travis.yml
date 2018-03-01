@@ -22,10 +22,15 @@ before_install:
     - echo $TRAVIS_TAG
     
     - sudo apt-get -qq update
-    - sudo apt-get install -y cython python-numpy python-scipy
+    - sudo apt-get install -y cython
+    - sudo apt-get install -y python-numpy
+    - sudo apt-get install -y python-scipy
 
 install:
     - echo "install..."
+    - pip install cython
+    - pip install numpy
+    - pip install scipy
 
 script:
     - echo "script..."
