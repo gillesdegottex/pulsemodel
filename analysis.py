@@ -261,8 +261,8 @@ def analysisf(fwav,
         inf0txt_file=None, f0_min=60, f0_max=600, f0_file=None, f0_log=False,
         inf0bin_file=None, # input f0 file in binary
         spec_file=None,
-            spec_mceporder=None, # Mel-cepstral order for compressing the spectrogram (typically 59; None: no compression)
-            spec_nbfwbnds=None,  # Number of mel-bands in the compressed half log spectrogram (None: no compression)
+        spec_mceporder=None, # Mel-cepstral order for compressing the spectrogram (typically 59; None: no compression)
+        spec_nbfwbnds=None,  # Number of mel-bands in the compressed half log spectrogram (None: no compression)
         pdd_file=None, pdd_mceporder=None,   # Mel-cepstral order for compressing PDD spectrogram (typically 59; None: no compression)
         nm_file=None, nm_nbfwbnds=None,  # Number of mel-bands in the compressed noise mask (None: no compression)
         verbose=1):
