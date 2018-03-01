@@ -285,6 +285,7 @@ def analysisf(fwav,
         f0_values = f0s[:,1]
         if verbose>0: print('    Output F0 {} in: {}'.format(f0_values.shape, f0_file))
         if f0_log: f0_values = np.log(f0_values)
+        if os.path.dirname(f0_file)!='' and (not os.path.isdir(os.path.dirname(f0_file))): os.mkdir(os.path.dirname(f0_file))
         f0_values.astype(np.float32).tofile(f0_file)
 
     SPEC = None
@@ -295,6 +296,7 @@ def analysisf(fwav,
         if not spec_nbfwbnds is None:
             SPEC = sp.linbnd2fwbnd(np.log(abs(SPEC)), fs, dftlen, spec_nbfwbnds)
         if verbose>0: print('    Output Spectrogram size={} in: {}'.format(SPEC.shape, spec_file))
+        if os.path.dirname(spec_file)!='' and (not os.path.isdir(os.path.dirname(spec_file))): os.mkdir(os.path.dirname(spec_file))
         SPEC.astype(np.float32).tofile(spec_file)
 
     PDD = None
@@ -307,6 +309,7 @@ def analysisf(fwav,
             PDD[PDD<0.001] = 0.001 # From COVAREP
             PDD = sp.spec2mcep(PDD, sp.bark_alpha(fs), pdd_mceporder)
         if verbose>0: print('    Output PDD size={} in: {}'.format(PDD.shape, pdd_file))
+        if os.path.dirname(pdd_file)!='' and (not os.path.isdir(os.path.dirname(pdd_file))): os.mkdir(os.path.dirname(pdd_file))
         PDD.astype(np.float32).tofile(pdd_file)
 
     NM = None
@@ -317,6 +320,7 @@ def analysisf(fwav,
             # If asked, compress the noise mask using a number of mel bands
             NM = sp.linbnd2fwbnd(NM, fs, dftlen, nm_nbfwbnds)
         if verbose>0: print('    Output Noise Mask size={} in: {}'.format(NM.shape, nm_file))
+        if os.path.dirname(nm_file)!='' and (not os.path.isdir(os.path.dirname(nm_file))): os.mkdir(os.path.dirname(nm_file))
         NM.astype(np.float32).tofile(nm_file)
 
     if verbose>2:
