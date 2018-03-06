@@ -262,6 +262,7 @@ def analysisf(fwav,
         inf0bin_file=None, # input f0 file in binary
         spec_file=None,
         spec_mceporder=None, # Mel-cepstral order for compressing the spectrogram (typically 59; None: no compression)
+        spec_fwceporder=None,# Frequency warped cepstral order (very similar to above, just faster a less precise) (typically 59; None: no compression)
         spec_nbfwbnds=None,  # Number of mel-bands in the compressed half log spectrogram (None: no compression)
         pdd_file=None, pdd_mceporder=None,   # Mel-cepstral order for compressing PDD spectrogram (typically 59; None: no compression)
         nm_file=None, nm_nbfwbnds=None,  # Number of mel-bands in the compressed noise mask (None: no compression)
@@ -293,6 +294,8 @@ def analysisf(fwav,
         SPEC = analysis_spec(wav, fs, f0s, shift=shift, dftlen=dftlen, verbose=verbose)
         if not spec_mceporder is None:
             SPEC = sp.spec2mcep(SPEC, sp.bark_alpha(fs), order=spec_mceporder)
+        if not spec_fwceporder is None:
+            SPEC = sp.loghspec2fwcep(np.log(abs(SPEC)), fs, order=spec_fwceporder)
         if not spec_nbfwbnds is None:
             SPEC = sp.linbnd2fwbnd(np.log(abs(SPEC)), fs, dftlen, spec_nbfwbnds)
         if verbose>0: print('    Output Spectrogram size={} in: {}'.format(SPEC.shape, spec_file))

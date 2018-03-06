@@ -280,7 +280,7 @@ def synthesize(fs, f0s, SPEC, NM=None, wavlen=None
 
 
 
-def synthesizef(fs, shift=0.005, dftlen=4096, ff0=None, flf0=None, fspec=None, fmcep=None, fpdd=None, fmpdd=None, fnm=None, fbndnm=None, nm_cont=False, fsyn=None, verbose=1):
+def synthesizef(fs, shift=0.005, dftlen=4096, ff0=None, flf0=None, fspec=None, ffwcep=None, fmcep=None, fpdd=None, fmpdd=None, fnm=None, fbndnm=None, nm_cont=False, fsyn=None, verbose=1):
     '''
     Call the synthesis from python using file inputs and outputs
     '''
@@ -295,6 +295,10 @@ def synthesizef(fs, shift=0.005, dftlen=4096, ff0=None, flf0=None, fspec=None, f
     if fspec:
         SPEC = np.fromfile(fspec, dtype=np.float32)
         SPEC = SPEC.reshape((len(f0), -1))
+    if ffwcep:
+        FWCEP = np.fromfile(ffwcep, dtype=np.float32)
+        FWCEP = FWCEP.reshape((len(f0), -1))
+        SPEC = np.exp(sp.fwcep2loghspec(FWCEP, fs, dftlen))
     if fmcep:
         MCEP = np.fromfile(fmcep, dtype=np.float32)
         MCEP = MCEP.reshape((len(f0), -1))
@@ -341,6 +345,7 @@ if  __name__ == "__main__" :
     argpar.add_argument("--f0file", default=None, help="Input f0[Hz] file")
     argpar.add_argument("--logf0file", default=None, help="Input f0[log Hz] file")
     argpar.add_argument("--specfile", default=None, help="Input amplitude spectrogram [linear values]")
+    argpar.add_argument("--fwcepfile", default=None, help="Input amplitude spectrogram [frequency warped cepstrum values]")
     argpar.add_argument("--mcepfile", default=None, help="Input amplitude spectrogram [mel-cepstrum values]")
     argpar.add_argument("--pddfile", default=None, help="Input Phase Distortion Deviation file [linear values]")
     argpar.add_argument("--mpddfile", default=None, help="Input Phase Distortion Deviation file [mel-cepstrum values]")
@@ -354,4 +359,4 @@ if  __name__ == "__main__" :
     args = argpar.parse_args()
     args.dftlen = 4096
 
-    synthesizef(args.fs, shift=args.shift, dftlen=args.dftlen, ff0=args.f0file, flf0=args.logf0file, fspec=args.specfile, fmcep=args.mcepfile, fnm=args.nmfile, fbndnm=args.bndnmfile, nm_cont=args.nm_cont, fpdd=args.pddfile, fmpdd=args.mpddfile, fsyn=args.synthfile, verbose=args.verbose)
+    synthesizef(args.fs, shift=args.shift, dftlen=args.dftlen, ff0=args.f0file, flf0=args.logf0file, fspec=args.specfile, ffwcep=args.fwcepfile, fmcep=args.mcepfile, fnm=args.nmfile, fbndnm=args.bndnmfile, nm_cont=args.nm_cont, fpdd=args.pddfile, fmpdd=args.mpddfile, fsyn=args.synthfile, verbose=args.verbose)
