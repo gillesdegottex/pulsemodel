@@ -100,7 +100,7 @@ class TestSmoke(unittest.TestCase):
         syn = pulsemodel.synthesize(fs, f0s, SPEC, NM=NM, wavlen=len(wav))
 
         syn = pulsemodel.synthesize(fs, f0s, SPEC, NM=NM, wavlen=len(wav)
-                        , ener_multT0=False
+                        , ener_multT0=True
                         , nm_cont=True, nm_lowpasswinlen=13, hp_f0coef=0.25, antipreechohwindur=0.002
                         , pp_f0_rmsteps=True, pp_f0_smooth=0.100, pp_atten1stharminsilences=-25
                         , verbose=verbose)
