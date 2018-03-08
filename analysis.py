@@ -9,6 +9,9 @@ References
         harmonic model in speech synthesis applications," EURASIP, Journal on
         Audio, Speech, and Music Processing - Special Issue: Models of Speech -
         In Search of Better Representations, vol. 2014, iss. 1, p. 38, 2014.
+    [3] G. Degottex, P. Lanchantin and M. Gales, "A Log Domain Pulse Model for
+        Parametric Speech Synthesis", IEEE Transactions on Audio, Speech, and
+        Language Processing, 26(1):57-70, 2018.
 
 Copyright(C) 2016 Engineering Department, University of Cambridge, UK.
 

@@ -22,6 +22,9 @@ Reference
     [1] G. Degottex, P. Lanchantin, and M. Gales, "A Pulse Model in Log-domain
         for a Uniform Synthesizer," in Proc. 9th Speech Synthesis Workshop
         (SSW9), 2016.
+    [2] G. Degottex, P. Lanchantin and M. Gales, "A Log Domain Pulse Model for
+        Parametric Speech Synthesis", IEEE Transactions on Audio, Speech, and
+        Language Processing, 26(1):57-70, 2018.
 
 Copyright(C) 2016 Engineering Department, University of Cambridge, UK.
 
