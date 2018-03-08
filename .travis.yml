@@ -48,19 +48,18 @@ script:
     - rm -fr ../pulsemodel_source_build/external/pyworld/lib/World/.git*
     - cp -fr ../pulsemodel_source_build pulsemodel
 
-    - cp -fr ../pulsemodel_source_build pulsemodel_test
-    - cd pulsemodel_test
+    - zip -r $PACKAGENAME pulsemodel
+    - ls
+    - ls -l $PACKAGENAME
+
+    - cd pulsemodel
     - make test
     - pwd
     - ls -l /home/travis/build/gillesdegottex/pulsemodel/pulsemodel/
     - ls -l /home/travis/build/gillesdegottex/pulsemodel/pulsemodel/sigproc/
-    - ls -l /home/travis/build/gillesdegottex/pulsemodel/pulsemodel_test/sigproc/
     - python test/test_repeat.py
     - cd ..
 
-    - zip -r $PACKAGENAME pulsemodel
-    - ls
-    - ls -l $PACKAGENAME
 
 after_success:
     - codecov
