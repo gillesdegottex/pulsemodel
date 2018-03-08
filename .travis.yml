@@ -59,7 +59,9 @@ script:
 
     # Now test the package that we just built
     - cd pulsemodel
-    - make test_fetch_data
+    - cd test
+    - make sample.scp
+    - cd ..
     - pwd
     - coverage run --source=. --omit="test/*","external/*" test/test_smoke.py
     - cd ..
