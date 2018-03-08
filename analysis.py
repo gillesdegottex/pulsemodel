@@ -270,7 +270,7 @@ def analysisf(fwav,
         finf0bin=None, # input f0 file in binary
         fspec=None,
         spec_mceporder=None, # Mel-cepstral order for compressing the spectrogram (typically 59; None: no compression)
-        spec_fwceporder=None,# Frequency warped cepstral order (very similar to above, just faster a less precise) (typically 59; None: no compression)
+        spec_fwceporder=None,# Frequency warped cepstral order (very similar to above, just faster and less precise) (typically 59; None: no compression)
         spec_nbfwbnds=None,  # Number of mel-bands in the compressed half log spectrogram (None: no compression)
         fpdd=None, pdd_mceporder=None,   # Mel-cepstral order for compressing PDD spectrogram (typically 59; None: no compression)
         fnm=None, nm_nbfwbnds=None,  # Number of mel-bands in the compressed noise mask (None: no compression)
@@ -352,6 +352,7 @@ def main(argv):
     argpar.add_argument("--f0_log", action='store_true', help="Output f0 file with log Hertz values instead of linear Hertz (def. False)")
     argpar.add_argument("--spec", default=None, help="Output spectrum-related file")
     argpar.add_argument("--spec_mceporder", default=None, type=int, help="Mel-cepstral order for the spectrogram (None:uncompressed; typically 59)")
+    argpar.add_argument("--spec_fwceporder", default=None, type=int, help="Frequency warped cepstral order (very similar to above, just faster and less precise) (typically 59)")
     argpar.add_argument("--spec_nbfwbnds", default=None, type=int, help="Number of mel-bands in the compressed half log spectrogram (None:uncompressed; typically 129 (should be odd size as long as full spectrum size if power of 2 (even size)")
     argpar.add_argument("--pdd", default=None, help="Output Phase Distortion Deviation (PDD) file")
     argpar.add_argument("--pdd_mceporder", default=None, type=int, help="Cepstral order for PDD (None:uncompressed; typically 59)")
@@ -365,7 +366,7 @@ def main(argv):
               dftlen=args.dftlen,
               finf0txt=args.inf0txt, f0_min=args.f0_min, f0_max=args.f0_max, ff0=args.f0, f0_log=args.f0_log,
               finf0bin=args.inf0bin,
-              fspec=args.spec, spec_mceporder=args.spec_mceporder, spec_nbfwbnds=args.spec_nbfwbnds,
+              fspec=args.spec, spec_mceporder=args.spec_mceporder, spec_fwceporder=args.spec_fwceporder, spec_nbfwbnds=args.spec_nbfwbnds,
               fpdd=args.pdd, pdd_mceporder=args.pdd_mceporder,
               fnm=args.nm, nm_nbfwbnds=args.nm_nbfwbnds,
               verbose=args.verbose)

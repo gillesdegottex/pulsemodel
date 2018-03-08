@@ -22,10 +22,18 @@ class TestSmoke(unittest.TestCase):
         analysis.main(['test/'+fname, '--f0_max', '200', '--f0', 'test/'+fname.replace('.wav','.f0')])
         analysis.main(['test/'+fname, '--f0_min', '81', '--f0_max', '220', '--f0', 'test/'+fname.replace('.wav','.f0')])
         analysis.main(['test/'+fname, '--f0', 'test/'+fname.replace('.wav','.f0')])
+
+        f0s = np.fromfile('test/'+fname.replace('.wav','.f0'), dtype=np.float32)
+        f0s = f0s.reshape((-1, 1))
+        np.savetxt('test/'+fname.replace('.wav','.f0txt'), f0s)
+
+        analysis.main(['test/'+fname, '--inf0txt', 'test/'+fname.replace('.wav','.f0txt'), '--spec', 'test/'+fname.replace('.wav','.spec')])
+
         analysis.main(['test/'+fname, '--inf0bin', 'test/'+fname.replace('.wav','.f0'), '--spec', 'test/'+fname.replace('.wav','.spec')])
         analysis.main(['test/'+fname, '--f0_log', '--f0', 'test/'+fname.replace('.wav','.lf0')])
         analysis.main(['test/'+fname, '--spec', 'test/'+fname.replace('.wav','.spec')])
-        # analysis.main(['test/'+fname, ' --spec_mceporder', '60', '--spec', 'test/'+fname.replace('.wav','.spec')]) # Need SPTK for this one
+        # analysis.main(['test/'+fname, ' --spec_mceporder', '59', '--spec', 'test/'+fname.replace('.wav','.spec')]) # Need SPTK for this one
+        analysis.main(['test/'+fname, '--spec_fwceporder', '59', '--spec', 'test/'+fname.replace('.wav','.fwcep')])
         analysis.main(['test/'+fname, '--spec_nbfwbnds', '65', '--spec', 'test/'+fname.replace('.wav','.fwlspec')])
         analysis.main(['test/'+fname, '--pdd', 'test/'+fname.replace('.wav','.pdd')])
         # analysis.main(['test/'+fname, '--pdd_mceporder', '60', '--pdd', 'test/'+fname.replace('.wav','.pdd')])  # Need SPTK for this one
@@ -45,6 +53,7 @@ class TestSmoke(unittest.TestCase):
         synthesis.main(['test/'+fname.replace('.wav','.resynth.wav'), '--fs', '16000', '--f0', 'test/'+fname.replace('.wav','.f0'), '--spec', 'test/'+fname.replace('.wav','.spec'), '--pdd', 'test/'+fname.replace('.wav','.pdd')])
         synthesis.main(['test/'+fname.replace('.wav','.resynth.wav'), '--fs', '16000', '--f0', 'test/'+fname.replace('.wav','.f0'), '--spec', 'test/'+fname.replace('.wav','.spec'), '--nm', 'test/'+fname.replace('.wav','.nm')])
         synthesis.main(['test/'+fname.replace('.wav','.resynth.wav'), '--fs', '16000', '--logf0', 'test/'+fname.replace('.wav','.lf0'), '--fwlspec', 'test/'+fname.replace('.wav','.fwlspec'), '--fwnm', 'test/'+fname.replace('.wav','.fwnm')])
+        synthesis.main(['test/'+fname.replace('.wav','.resynth.wav'), '--fs', '16000', '--logf0', 'test/'+fname.replace('.wav','.lf0'), '--fwcep', 'test/'+fname.replace('.wav','.fwcep'), '--fwnm', 'test/'+fname.replace('.wav','.fwnm')])
 
 
     # def test_smoke_analysisf(self):

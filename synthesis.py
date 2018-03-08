@@ -303,7 +303,8 @@ def synthesizef(fs, shift=0.005, dftlen=4096, ff0=None, flf0=None, fspec=None, f
         FWCEP = np.fromfile(ffwcep, dtype=np.float32)
         FWCEP = FWCEP.reshape((len(f0), -1))
         SPEC = np.exp(sp.fwcep2loghspec(FWCEP, fs, dftlen))
-    if fmcep:
+    if fmcep:                           # pragma: no cover
+                                        # Cannot test this because it needs SPTK
         MCEP = np.fromfile(fmcep, dtype=np.float32)
         MCEP = MCEP.reshape((len(f0), -1))
         SPEC = sp.mcep2spec(MCEP, sp.bark_alpha(fs), dftlen)
@@ -317,7 +318,8 @@ def synthesizef(fs, shift=0.005, dftlen=4096, ff0=None, flf0=None, fspec=None, f
         NM = PDD.copy()
         NM[PDD<pdd_thresh] = 0.0
         NM[PDD>pdd_thresh] = 1.0
-    if fmpdd:
+    if fmpdd:                      # pragma: no cover
+                                   # Cannot test this because it needs SPTK
         MPDD = np.fromfile(fmpdd, dtype=np.float32)
         MPDD = MPDD.reshape((len(f0), -1))
         PDD = sp.mcep2spec(MPDD, sp.bark_alpha(fs), dftlen)
