@@ -45,15 +45,15 @@ class TestSmoke(unittest.TestCase):
         run_command('python synthesis.py test/'+fname.replace('.wav','.resynth.wav')+' --fs 16000 --f0 test/'+fname.replace('.wav','.f0')+' --spec test/'+fname.replace('.wav','.spec')+' --nm test/'+fname.replace('.wav','.nm'))
         run_command('python synthesis.py test/'+fname.replace('.wav','.resynth.wav')+' --fs 16000 --logf0 test/'+fname.replace('.wav','.lf0')+' --fwlspec test/'+fname.replace('.wav','.fwlspec')+' --fwnm test/'+fname.replace('.wav','.fwnm'))
 
-    def test_smoke_analysisf(self):
-        fname = filenames[0] # Just with one file for smoke test
-        import pulsemodel
-
-        f0_min = 75
-        f0_max = 800
-
-        pulsemodel.analysisf(fname, f0_min=f0_min, f0_max=f0_max, ff0=fname.replace('.wav','.lf0'), f0_log=True,
-        fspec=fname.replace('.wav','.fwlspec'), spec_nbfwbnds=65, fnm=fname.replace('.wav','.fwnm'), nm_nbfwbnds=33, verbose=1)
+    # def test_smoke_analysisf(self):
+    #     fname = filenames[0] # Just with one file for smoke test
+    #     import pulsemodel
+    #
+    #     f0_min = 75
+    #     f0_max = 800
+    #
+    #     pulsemodel.analysisf(fname, f0_min=f0_min, f0_max=f0_max, ff0=fname.replace('.wav','.lf0'), f0_log=True,
+    #     fspec=fname.replace('.wav','.fwlspec'), spec_nbfwbnds=65, fnm=fname.replace('.wav','.fwnm'), nm_nbfwbnds=33, verbose=1)
 
     def test_smoke_analysis_synthesis(self):
         fname = filenames[0] # Just with one file for smoke test
