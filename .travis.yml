@@ -53,6 +53,7 @@ script:
     - make test
     - pwd
     - ls -l /home/travis/build/gillesdegottex/pulsemodel/pulsemodel/
+    - ls -l /home/travis/build/gillesdegottex/pulsemodel/pulsemodel/sigproc/
     - python test/test_repeat.py
     - cd ..
 
