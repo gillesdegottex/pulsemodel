@@ -13,7 +13,8 @@ filenames = ['slt_arctic_a0010.wav', 'bdl_arctic_a0020.wav', 'clb_arctic_a0030.w
 
 class TestSmoke(unittest.TestCase):
 
-    def test_smoke_cmd_analysis(self):
+    @classmethod
+    def test_smoke_cmd_analysis(cls):
         fname = filenames[0] # Just with one file for smoke test
 
         import analysis
@@ -42,7 +43,8 @@ class TestSmoke(unittest.TestCase):
 
         # TODO Test various sampling fromats, encoding and sampling rates for wav files
 
-    def test_smoke_cmd_synthesis(self):
+    @classmethod
+    def test_smoke_cmd_synthesis(cls):
         fname = filenames[0] # Just with one file for smoke test
 
         import synthesis
@@ -66,7 +68,8 @@ class TestSmoke(unittest.TestCase):
     #     pulsemodel.analysisf(fname, f0_min=f0_min, f0_max=f0_max, ff0=fname.replace('.wav','.lf0'), f0_log=True,
     #     fspec='test/'+fname.replace('.wav','.fwlspec'), spec_nbfwbnds=65, fnm=fname.replace('.wav','.fwnm'), nm_nbfwbnds=33, verbose=1)
 
-    def test_smoke_analysis_synthesis(self):
+    @classmethod
+    def test_smoke_analysis_synthesis(cls):
         fname = filenames[0] # Just with one file for smoke test
 
         f0_min = 75
@@ -78,7 +81,7 @@ class TestSmoke(unittest.TestCase):
         import pulsemodel
         import sigproc as sp
 
-        wav, fs, enc = sp.wavread('test/'+fname)
+        wav, fs, _ = sp.wavread('test/'+fname)
 
         f0s, SPEC, PDD, NM = pulsemodel.analysis(wav, fs)
 
@@ -100,17 +103,16 @@ class TestSmoke(unittest.TestCase):
         f0s, SPEC, PDD, NM = pulsemodel.analysis(wav, fs, f0s=f0s, f0_min=f0_min, f0_max=f0_max, shift=shift, dftlen=dftlen, verbose=verbose)
 
 
-        import pulsemodel
-        syn = pulsemodel.synthesize(fs, f0s, SPEC, wavlen=len(wav))
+        _ = pulsemodel.synthesize(fs, f0s, SPEC, wavlen=len(wav))
 
-        syn = pulsemodel.synthesize(fs, f0s, SPEC, NM=NM, wavlen=len(wav))
+        _ = pulsemodel.synthesize(fs, f0s, SPEC, NM=NM, wavlen=len(wav))
 
         NM = PDD.copy()
         NM[NM>0.75] = 1
         NM[NM<=0.75] = 0
-        syn = pulsemodel.synthesize(fs, f0s, SPEC, NM=NM, wavlen=len(wav))
+        _ = pulsemodel.synthesize(fs, f0s, SPEC, NM=NM, wavlen=len(wav))
 
-        syn = pulsemodel.synthesize(fs, f0s, SPEC, NM=NM, wavlen=len(wav)
+        _ = pulsemodel.synthesize(fs, f0s, SPEC, NM=NM, wavlen=len(wav)
                         , ener_multT0=True
                         , nm_cont=True, nm_lowpasswinlen=13, hp_f0coef=0.25, antipreechohwindur=0.002
                         , pp_f0_rmsteps=True, pp_f0_smooth=0.100, pp_atten1stharminsilences=-25
@@ -128,8 +130,8 @@ class TestSmoke(unittest.TestCase):
         for fname in filenames:
             fname = 'test/'+fname
             lf0s_ref = None
-            pwf0_ref = None
-            SPEC_ref = None
+            # pwf0_ref = None
+            # SPEC_ref = None
             fwlspec_ref = None
             fwnm_ref = None
             for _ in xrange(2):

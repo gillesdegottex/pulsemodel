@@ -47,7 +47,7 @@ Author
 
 import argparse
 import sys
-import os
+
 import numpy as np
 np.random.seed(123) # Generate always the same "random" numbers, for debugging.
 import scipy
@@ -76,7 +76,7 @@ def synthesize(fs, f0s, SPEC, NM=None, wavlen=None
 
     # Check the size of the inputs
     if f0s.shape[0]!=SPEC.shape[0]:
-        raise ValueError('F0 size {} and spectrogram size {} do not match'.format(len(f0), SPEC.shape[0])) # pragma: no cover
+        raise ValueError('F0 size {} and spectrogram size {} do not match'.format(f0s.shape[0], SPEC.shape[0])) # pragma: no cover
     if not NM is None:
         if SPEC.shape!=NM.shape:
             raise ValueError('spectrogram size {} and NM size {} do not match.'.format(SPEC.shape, NM.shape)) # pragma: no cover
@@ -254,7 +254,6 @@ def synthesize(fs, f0s, SPEC, NM=None, wavlen=None
         # Write the synthesized segment in the final waveform
         if winidx[0]<0 or winidx[-1]>=wavlen:
             # The window is partly outside of the waveform ...
-            wav4win = np.zeros(winlen)
             # ... thus copy only the existing part
             itouse = np.logical_and(winidx>=0,winidx<wavlen)
             wav[winidx[itouse]] += deter[itouse]
@@ -266,7 +265,7 @@ def synthesize(fs, f0s, SPEC, NM=None, wavlen=None
     if verbose>2:                                             # pragma: no cover
         import matplotlib.pyplot as plt
         plt.ion()
-        f, axs = plt.subplots(3, 1, sharex=True, sharey=False)
+        _, axs = plt.subplots(3, 1, sharex=True, sharey=False)
         times = np.arange(len(wav))/float(fs)
         axs[0].plot(times, wav, 'k')
         axs[0].set_ylabel('Waveform\nAmplitude')

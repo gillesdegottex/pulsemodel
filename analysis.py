@@ -120,7 +120,7 @@ def analysis_spec(wav, fs, f0s,
         # pulsemodel.
         # Estimate the sinusoidal parameters at regular intervals in order
         # to build the amplitude spectral envelope
-        sinsreg, f0sps = sp.sinusoidal.estimate_sinusoidal_params(wav, fs, f0s, nbper=3, quadraticfit=True, verbose=verbose-1)
+        sinsreg, _ = sp.sinusoidal.estimate_sinusoidal_params(wav, fs, f0s, nbper=3, quadraticfit=True, verbose=verbose-1)
 
         warnings.warn('''\n\nWARNING: Neither straight_mcep nor WORLD's cheaptrick spectral envelope estimators are available.
          Thus, a SIMPLISTIC Linear interpolation will be used for the spectral envelope.
@@ -235,8 +235,8 @@ def plot_features(wav=None, fs=None, f0s=None, SPEC=None, PDD=None, NM=None): # 
     if not NM is None: nbview+=1
     import matplotlib.pyplot as plt
     plt.ion()
-    f, axs = plt.subplots(nbview, 1, sharex=True, sharey=False)
-    if not type(axs) is np.ndarray: axs = np.array([axs])
+    _, axs = plt.subplots(nbview, 1, sharex=True, sharey=False)
+    if not isinstance(axs, np.ndarray): axs = np.array([axs])
     view=0
     if not wav is None:
         times = np.arange(len(wav))/float(fs)
@@ -280,7 +280,7 @@ def analysisf(fwav,
         fnm=None, nm_nbfwbnds=None,  # Number of mel-bands in the compressed noise mask (None: no compression)
         verbose=1):
 
-    wav, fs, enc = sp.wavread(fwav)
+    wav, fs, _ = sp.wavread(fwav)
 
     if verbose>0: print('PM Analysis (dur={:.3f}s, fs={}Hz, f0 in [{},{}]Hz, shift={}s, dftlen={})'.format(len(wav)/float(fs), fs, f0_min, f0_max, shift, dftlen))
 
