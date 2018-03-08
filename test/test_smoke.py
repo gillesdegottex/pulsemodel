@@ -45,6 +45,48 @@ class TestSmoke(unittest.TestCase):
         run_command('python synthesis.py test/'+fname.replace('.wav','.resynth.wav')+' --fs 16000 --f0 test/'+fname.replace('.wav','.f0')+' --spec test/'+fname.replace('.wav','.spec')+' --nm test/'+fname.replace('.wav','.nm'))
         run_command('python synthesis.py test/'+fname.replace('.wav','.resynth.wav')+' --fs 16000 --logf0 test/'+fname.replace('.wav','.lf0')+' --fwlspec test/'+fname.replace('.wav','.fwlspec')+' --fwnm test/'+fname.replace('.wav','.fwnm'))
 
+    def test_smoke_analysis_synthesis(self):
+        fname = filenames[0] # Just with one file for smoke test
+
+        f0_min = 75
+        f0_max = 800
+        shift = 0.010
+        verbose = 1
+        dftlen = 512
+
+        import pulsemodel
+        import sigproc as sp
+
+        wav, fs, enc = sp.wavread('test/'+fname)
+
+        f0s, SPEC, PDD, NM = pulsemodel.analysis(wav, fs)
+
+        f0s = pulsemodel.analysis_f0postproc(wav, fs, f0_min=f0_min, f0_max=f0_max, shift=shift, verbose=verbose)
+
+        f0_min = 60
+        f0_max = 600
+        shift = 0.005
+        dftlen = 4096
+        f0s, SPEC, PDD, NM = pulsemodel.analysis(wav, fs, f0s=f0s, f0_min=f0_min, f0_max=f0_max, shift=shift, dftlen=dftlen, verbose=verbose)
+
+
+        import pulsemodel
+        syn = pulsemodel.synthesize(fs, f0s, SPEC, wavlen=len(wav))
+
+        syn = pulsemodel.synthesize(fs, f0s, SPEC, NM=NM, wavlen=len(wav))
+
+        NM = PDD.copy()
+        NM[NM>0.75] = 1
+        NM[NM<=0.75] = 0
+        syn = pulsemodel.synthesize(fs, f0s, SPEC, NM=NM, wavlen=len(wav))
+
+        syn = pulsemodel.synthesize(fs, f0s, SPEC, NM=NM, wavlen=len(wav)
+                        , ener_multT0=False
+                        , nm_cont=True, nm_lowpasswinlen=13, hp_f0coef=0.25, antipreechohwindur=0.002
+                        , pp_f0_rmsteps=True, pp_f0_smooth=0.100, pp_atten1stharminsilences=-25
+                        , verbose=verbose)
+
+
     def test_repeatability(self):
 
         f0_min = 60
@@ -53,7 +95,6 @@ class TestSmoke(unittest.TestCase):
         import pulsemodel
         # import pyworld
         # import sigproc as sp
-
 
         for fname in filenames:
             fname = 'test/'+fname
