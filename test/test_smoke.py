@@ -61,6 +61,10 @@ class TestSmoke(unittest.TestCase):
 
         f0s, SPEC, PDD, NM = pulsemodel.analysis(wav, fs)
 
+        _ = pulsemodel.analysis_f0postproc(wav, fs, f0s=np.zeros(f0s[:,1].shape), f0_min=f0_min, f0_max=f0_max, shift=shift, verbose=verbose)
+
+        _ = pulsemodel.analysis_f0postproc(wav, fs, f0s=f0s[:,1], f0_min=f0_min, f0_max=f0_max, shift=shift, verbose=verbose)
+
         f0s = pulsemodel.analysis_f0postproc(wav, fs, f0_min=f0_min, f0_max=f0_max, shift=shift, verbose=verbose)
 
         f0_min = 60
