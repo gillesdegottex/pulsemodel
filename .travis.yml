@@ -52,7 +52,7 @@ script:
     - cd pulsemodel_test
     - make test
     - pwd
-    - ll /home/travis/build/gillesdegottex/pulsemodel/pulsemodel/
+    - ls -l /home/travis/build/gillesdegottex/pulsemodel/pulsemodel/
     - python test/test_repeat.py
     - cd ..
 
