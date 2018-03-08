@@ -20,7 +20,7 @@ before_install:
     - echo $TRAVIS_TAG
     - export TRAVIS_TAG=`git describe --tags --exact-match HEAD 2>/dev/null`
     - echo $TRAVIS_TAG
-    
+
     - sudo apt-get -qq update
     - sudo apt-get install -y cython
     - sudo apt-get install -y python-numpy
@@ -51,6 +51,8 @@ script:
     - cp -fr ../pulsemodel_source_build pulsemodel_test
     - cd pulsemodel_test
     - make test
+    - pwd
+    - ll /home/travis/build/gillesdegottex/pulsemodel/pulsemodel/
     - python test/test_repeat.py
     - cd ..
 
@@ -71,4 +73,3 @@ deploy:
   on:
     repo: gillesdegottex/pulsemodel
     tags: true
-
