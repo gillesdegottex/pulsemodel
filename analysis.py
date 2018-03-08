@@ -215,7 +215,7 @@ def analysis(wav, fs, f0s=None, f0_min=60, f0_max=600,
     NM = analysis_nm(wav, fs, f0s, PDD, verbose=verbose)
 
     if verbose>2:
-        plot_features(wav=wav, fs=fs, f0s=f0s, SPEC=SPEC, PDD=PDD, NM=NM)
+        plot_features(wav=wav, fs=fs, f0s=f0s, SPEC=SPEC, PDD=PDD, NM=NM) # pragma: no cover
 
     return f0s, SPEC, PDD, NM
 
@@ -300,7 +300,8 @@ def analysisf(fwav,
     SPEC = None
     if fspec:
         SPEC = analysis_spec(wav, fs, f0s, shift=shift, dftlen=dftlen, verbose=verbose)
-        if not spec_mceporder is None:
+        if not spec_mceporder is None: # pragma: no cover
+                                       # Cannot test this because it needs SPTK
             SPEC = sp.spec2mcep(SPEC, sp.bark_alpha(fs), order=spec_mceporder)
         if not spec_fwceporder is None:
             SPEC = sp.loghspec2fwcep(np.log(abs(SPEC)), fs, order=spec_fwceporder)
@@ -315,7 +316,8 @@ def analysisf(fwav,
         PDD = analysis_pdd(wav, fs, f0s, dftlen=dftlen, verbose=verbose)
 
     if fpdd:
-        if not pdd_mceporder is None:
+        if not pdd_mceporder is None:  # pragma: no cover
+                                       # Cannot test this because it needs SPTK
             # If asked, compress PDD
             PDD[PDD<0.001] = 0.001 # From COVAREP
             PDD = sp.spec2mcep(PDD, sp.bark_alpha(fs), pdd_mceporder)
@@ -335,7 +337,7 @@ def analysisf(fwav,
         NM.astype(np.float32).tofile(fnm)
 
     if verbose>2:
-        plot_features(wav=wav, fs=fs, f0s=f0s, SPEC=SPEC, PDD=PDD, NM=NM)
+        plot_features(wav=wav, fs=fs, f0s=f0s, SPEC=SPEC, PDD=PDD, NM=NM) # pragma: no cover
 
 if  __name__ == "__main__" :
     argpar = argparse.ArgumentParser()
