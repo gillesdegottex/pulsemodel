@@ -46,7 +46,7 @@ import argparse
 import sys
 import os
 import numpy as np
-np.random.seed(0) # Generate always the same "random" numbers, for debugging.
+np.random.seed(123) # Generate always the same "random" numbers, for debugging.
 import scipy
 
 import sigproc as sp

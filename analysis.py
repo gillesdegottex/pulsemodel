@@ -35,6 +35,7 @@ import os
 import warnings
 
 import numpy as np
+np.random.seed(123) # Generate always the same "random" numbers, for debugging.
 
 import sigproc as sp
 import sigproc.pystraight
