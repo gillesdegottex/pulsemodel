@@ -60,7 +60,7 @@ script:
     # Now test the package that we just built
     - cd pulsemodel
     - cd test
-    - make sample.scp
+    - make samples.scp
     - cd ..
     - pwd
     - coverage run --source=. --omit="test/*","external/*" test/test_smoke.py
