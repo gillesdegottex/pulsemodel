@@ -21,6 +21,7 @@ build_pyworld: submodule_init
 
 test: build
 	cd test; $(MAKE)
+	python test/test_smoke.py
 
 distclean:
 	rm -f *.pyc
