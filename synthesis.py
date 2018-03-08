@@ -339,7 +339,7 @@ def synthesizef(fs, shift=0.005, dftlen=4096, ff0=None, flf0=None, fspec=None, f
 
     return syn
 
-if  __name__ == "__main__" :
+def main(argv):
     '''
     Call the synthesis from the command line
     '''
@@ -361,7 +361,10 @@ if  __name__ == "__main__" :
     argpar.add_argument("--shift", default=0.005, type=float, help="Time step[s] between the frames")
     #argpar.add_argument("--dftlen", dftlen=4096, type=float, help="Size of the DFT for extracting the features")
     argpar.add_argument("--verbose", default=1, help="Output some information")
-    args = argpar.parse_args()
+    args = argpar.parse_args(argv)
     args.dftlen = 4096
 
     synthesizef(args.fs, shift=args.shift, dftlen=args.dftlen, ff0=args.f0, flf0=args.logf0, fspec=args.spec, ffwlspec=args.fwlspec, ffwcep=args.fwcep, fmcep=args.mcep, fnm=args.nm, ffwnm=args.fwnm, nm_cont=args.nm_cont, fpdd=args.pdd, fmpdd=args.mpdd, fsyn=args.synth, verbose=args.verbose)
+
+if  __name__ == "__main__" :            # pragma: no cover
+    main(sys.argv[1:])

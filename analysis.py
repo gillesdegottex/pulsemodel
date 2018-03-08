@@ -339,7 +339,7 @@ def analysisf(fwav,
     if verbose>2:
         plot_features(wav=wav, fs=fs, f0s=f0s, SPEC=SPEC, PDD=PDD, NM=NM) # pragma: no cover
 
-if  __name__ == "__main__" :
+def main(argv):
     argpar = argparse.ArgumentParser()
     argpar.add_argument("wavfile", help="Input wav file")
     argpar.add_argument("--shift", default=0.005, type=float, help="time step[s] between the input frames (def. 0.005s)")
@@ -358,7 +358,7 @@ if  __name__ == "__main__" :
     argpar.add_argument("--nm", default=None, help="Output noise mask (for PML vocoder)")
     argpar.add_argument("--nm_nbfwbnds", default=None, type=int, help="Number of mel-bands in the compressed noise mask (None:uncompressed; typically 33)")
     argpar.add_argument("--verbose", default=1, type=int, help="Output some information")
-    args = argpar.parse_args()
+    args = argpar.parse_args(argv)
 
     analysisf(args.wavfile,
               shift=args.shift,
@@ -369,3 +369,6 @@ if  __name__ == "__main__" :
               fpdd=args.pdd, pdd_mceporder=args.pdd_mceporder,
               fnm=args.nm, nm_nbfwbnds=args.nm_nbfwbnds,
               verbose=args.verbose)
+
+if  __name__ == "__main__" :            # pragma: no cover
+    main(sys.argv[1:])
