@@ -52,12 +52,11 @@ script:
     - ls
     - ls -l $PACKAGENAME
 
+    # Now test the package that we just built
     - cd pulsemodel
-    - make test
+    - make test_fetch_data
     - pwd
-    - ls -l /home/travis/build/gillesdegottex/pulsemodel/pulsemodel/
-    - ls -l /home/travis/build/gillesdegottex/pulsemodel/pulsemodel/sigproc/
-    - coverage run --source=. --omit="test/*","external/*" test/test_repeat.py
+    - coverage run --source=. --omit="test/*","external/*" test/test_smoke.py
     - cd ..
 
 
