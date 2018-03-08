@@ -51,7 +51,7 @@ script:
     - cp -fr ../pulsemodel_source_build pulsemodel_test
     - cd pulsemodel_test
     - make test
-    - coverage run --source=. --omit="test/*","external/*" test/test_repeat.py
+    - python test/test_repeat.py
     - cd ..
 
     - zip -r $PACKAGENAME pulsemodel
