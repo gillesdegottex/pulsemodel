@@ -38,12 +38,10 @@
 
 # .PRECIOUS: %.resynth.wav %.wav %.f0 %.spec %.pdd %.nm %.bndnm
 
-.PHONY: test_fetch_data
-
 # RESYNTHESIS=slt_arctic_a0010.resynth.wav bdl_arctic_a0020.resynth.wav clb_arctic_a0030.resynth.wav awb_arctic_a0040.resynth.wav
 
 all:
-	$(MAKE) test_fetch_data
+	$(MAKE) samples.scp
 	# $(MAKE) smoke
 	# $(MAKE) ${RESYNTHESIS}
 
