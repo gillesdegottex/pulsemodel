@@ -36,14 +36,8 @@
 # Author
 #     Gilles Degottex <gad27@cam.ac.uk>
 
-# .PRECIOUS: %.resynth.wav %.wav %.f0 %.spec %.pdd %.nm %.bndnm
-
-# RESYNTHESIS=slt_arctic_a0010.resynth.wav bdl_arctic_a0020.resynth.wav clb_arctic_a0030.resynth.wav awb_arctic_a0040.resynth.wav
-
 all:
 	$(MAKE) samples.scp
-	# $(MAKE) smoke
-	# $(MAKE) ${RESYNTHESIS}
 
 samples.scp:
 	wget http://festvox.org/cmu_arctic/cmu_arctic/cmu_us_slt_arctic/wav/arctic_a0010.wav -O slt_arctic_a0010.wav
@@ -52,60 +46,8 @@ samples.scp:
 	wget http://festvox.org/cmu_arctic/cmu_arctic/cmu_us_awb_arctic/wav/arctic_a0040.wav -O awb_arctic_a0040.wav
 	ls *.wav |grep -v '.resynth.wav' > samples.scp
 
-
-# smoke_nbfwbnds:
-# 	python ../analysis.py smoke.wav --spec smoke.fwspec --spec_nbfwbnds 129
-# 	python ../analysis.py smoke.wav --nm smoke.fwnm --nm_nbfwbnds 33
-# 	# python ../synthesis.py smoke.resynth.wav --fs 16000 --f0file smoke.f0 --mcepfile smoke.fwspec # TODO
-# 	# python ../synthesis.py smoke.resynth.wav --fs 16000 --f0file smoke.f0 --specfile smoke.spec --mpddfile smoke.mpdd # TODO
-
-# Analysis ---------------------------------------------------------------------
-
-# %.f0 %.spec %.pdd: %.wav ../analysis.py
-	# @python ../analysis.py $< --f0 $(<:.wav=.f0) --spec $(<:.wav=.spec) --pdd $(<:.wav=.pdd)
-
-# # You can use this rule if you want to skip PDD and use the noisemask
-# %.f0 %.spec %.nm: %.wav ../analysis.py
-# 	python ../analysis.py $< --inf0txt $(<:.wav=.f0.txt) --f0 $(<:.wav=.f0) --spec $(<:.wav=.spec) --nm $(<:.wav=.nm)
-#
-# # Or this rule if you also want to compress the noisemask in mel bands
-# %.f0 %.spec %.bndnm: %.wav ../analysis.py
-# 	@python ../analysis.py $< --inf0txt $(<:.wav=.f0.txt) --f0 $(<:.wav=.f0) --spec $(<:.wav=.spec) --nm $(<:.wav=.bndnm) --nm_nbfwbnds 21
-
-# # If you have REAPER F0 estimator installed, you can also generate the f0 directly:
-# %.f0 %.spec %.pdd: %.wav ../analysis.py
-# 	@python ../analysis.py $< --f0 $(<:.wav=.f0) --spec $(<:.wav=.spec) --pdd $(<:.wav=.pdd)
-
-
-# Synthesis --------------------------------------------------------------------
-
-# %.resynth.wav: %.f0 %.spec %.pdd ../synthesis.py
-	# @python ../synthesis.py $@ --f0file $< --specfile $(<:.f0=.spec) --pddfile $(<:.f0=.pdd) --fs 16000
-
-# # You can use this rule if you want to skip PDD and use the noisemask
-# %.resynth.wav: %.f0 %.spec %.nm ../synthesis.py
-# 	@python ../synthesis.py $@ --f0file $< --specfile $(<:.f0=.spec) --noisemaskfile $(<:.f0=.nm) --fs 16000 # TODO
-
-# # Or this rule if you also want to compress the noisemask in mel bands
-# %.resynth.wav: %.f0 %.spec %.bndnm ../synthesis.py
-# 	@python ../synthesis.py $@ --f0file $< --specfile $(<:.f0=.spec) --noisemaskfile $(<:.f0=.bndnm) --noisemask_nbbnds 21 --fs 16000 # TODO
-
 clean:
-	rm -f *.resynth.wav *.f0 *.lf0 *.logf0 *.spec *.fwspec *.pdd *.mpdd *.nm *.bndnm *.fwnm *.diff
+	rm -f *.resynth.wav *.f0 *.lf0 *.logf0 *.spec *.fwspec *.fwcep *.pdd *.mpdd *.nm *.bndnm *.fwnm *.diff
 
 distclean:
-	rm -f samples.scp *.wav *.f0 *.lf0 *.logf0 *.spec *.fwspec *.pdd *.mpdd *.nm *.bndnm *.fwnm *.diff
-
-
-# For debugging purpose --------------------------------------------------------
-# .PHONY: testref makeref
-
-# %.resynth.diff: %.resynth.wav %.resynth.ref.wav
-	# cmp $^ > $@
-
-# testref: $(RESYNTHESIS:.resynth.wav=.resynth.diff)
-	# $(NOOP)
-
-# makeref:
-	# $(foreach f,$(RESYNTHESIS),cp -f $(f) $(f:.resynth.wav=.resynth.ref.wav);)
-	# rm -f $(RESYNTHESIS:.resynth.wav=.resynth.diff)
+	rm -f samples.scp *.wav *.f0 *.lf0 *.logf0 *.spec *.fwspec *.fwcep *.pdd *.mpdd *.nm *.bndnm *.fwnm *.diff
