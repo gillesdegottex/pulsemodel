@@ -45,7 +45,7 @@ os.environ["PATH"] += os.pathsep + os.path.join(os.path.split(os.path.realpath(_
 # Add the path for WORLD vocoder's amplitude spectral envelope estimator
 sys.path.insert(0, os.path.join(os.path.split(os.path.realpath(__file__))[0],'external/pyworld/pyworld'))
 
-def analysis_f0postproc(wav, fs, f0s, f0_min=60, f0_max=600,
+def analysis_f0postproc(wav, fs, f0s=None, f0_min=60, f0_max=600,
              shift=0.005,        # Usually 5ms
              verbose=1):
     '''
@@ -87,7 +87,9 @@ def analysis_spec(wav, fs, f0s,
     Estimate the amplitude spectral envelope.
     '''
 
-    if sp.pystraight.isanalysiseavailable():
+    if sp.pystraight.isanalysiseavailable():   # pragma: no cover
+                                               # Cannot be tested since STRAIGHT
+                                               # is not openly available.
         warnings.warn('''\n\nWARNING: straight_mcep is available,
             STRAIGHT vocoder will thus be used instead of WORLD.
             Note that PML-related publications present results using STRAIGHT vocoder.
@@ -106,7 +108,9 @@ def analysis_spec(wav, fs, f0s,
         SPEC = pyworld.cheaptrick(wav, pwf0, pwts, fs, fft_size=dftlen)  # extract smoothed spectrogram
         SPEC = 10.0*np.sqrt(SPEC) # TODO Best gain correction I could find. Hard to find the good one between PML and WORLD different syntheses
 
-    else:
+    else:   # pragma: no cover
+        # This a safeguard that should never happend since WORLD is embeded in
+        # pulsemodel.
         # Estimate the sinusoidal parameters at regular intervals in order
         # to build the amplitude spectral envelope
         sinsreg, f0sps = sp.sinusoidal.estimate_sinusoidal_params(wav, fs, f0s, nbper=3, quadraticfit=True, verbose=verbose-1)
@@ -114,7 +118,7 @@ def analysis_spec(wav, fs, f0s,
         warnings.warn('''\n\nWARNING: Neither straight_mcep nor WORLD's cheaptrick spectral envelope estimators are available.
          Thus, a SIMPLISTIC Linear interpolation will be used for the spectral envelope.
          Do _NOT_ use this envelope for speech synthesis!
-         Please use a better one (e.g. STRAIGHT's).
+         Please use a better one (e.g. STRAIGHT's or WORLD's).
          If you use this simplistic envelope, the TTS quality will
          be lower than that in the results reported.
         ''', RuntimeWarning)
@@ -166,7 +170,7 @@ def analysis_nm(wav, fs,
     '''
 
     if f0s.shape[0]!=PDD.shape[0]:
-        raise ValueError('f0s size and PDD size do not match!')
+        raise ValueError('f0s size and PDD size do not match!') # pragma: no cover
 
     shift = np.mean(np.diff(f0s[:,0])) # Get the time shift from the F0 times
     dftlen = (PDD.shape[1]-1)*2 # and the DFT len from the PDD feature
