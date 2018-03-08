@@ -88,15 +88,15 @@ def analysis_spec(wav, fs, f0s,
     '''
 
     if sp.pystraight.isanalysiseavailable():
+        warnings.warn('''\n\nWARNING: straight_mcep is available,
+            STRAIGHT vocoder will thus be used instead of WORLD.
+            Note that PML-related publications present results using STRAIGHT vocoder.
+        ''', RuntimeWarning)
+
         # Use STRAIGHT's envelope if available (as in PML's publications)
         SPEC = sigproc.pystraight.analysis_spec(wav, fs, f0s, shift, dftlen, keeplen=True)
 
     elif sigproc.interfaces.worldvocoder_is_available():
-        warnings.warn('''\n\nWARNING: straight_mcep is not available,
-            but WORLD vocoder has been detected and will be used instead.
-            Note that PML-related publications present results using STRAIGHT vocoder.
-            The results might be thus different.
-        ''', RuntimeWarning)
 
         # Then try WORLD vocoder
         import pyworld
