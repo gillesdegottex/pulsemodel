@@ -1,3 +1,6 @@
+[![Build Status](https://travis-ci.org/gillesdegottex/pulsemodel.svg?branch=master)](https://travis-ci.org/gillesdegottex/pulsemodel)
+[![codecov](https://codecov.io/gh/gillesdegottex/pulsemodel/branch/master/graph/badge.svg)](https://codecov.io/gh/gillesdegottex/pulsemodel)
+
 ## Pulse model analysis and synthesis
 
 It is basically the vocoder described in:
