@@ -258,14 +258,14 @@ def plot_features(wav=None, fs=None, f0s=None, SPEC=None, PDD=None, NM=None):
 def analysisf(fwav,
         shift=0.005,
         dftlen=4096,
-        inf0txt_file=None, f0_min=60, f0_max=600, f0_file=None, f0_log=False,
-        inf0bin_file=None, # input f0 file in binary
-        spec_file=None,
+        finf0txt=None, f0_min=60, f0_max=600, ff0=None, f0_log=False,
+        finf0bin=None, # input f0 file in binary
+        fspec=None,
         spec_mceporder=None, # Mel-cepstral order for compressing the spectrogram (typically 59; None: no compression)
         spec_fwceporder=None,# Frequency warped cepstral order (very similar to above, just faster a less precise) (typically 59; None: no compression)
         spec_nbfwbnds=None,  # Number of mel-bands in the compressed half log spectrogram (None: no compression)
-        pdd_file=None, pdd_mceporder=None,   # Mel-cepstral order for compressing PDD spectrogram (typically 59; None: no compression)
-        nm_file=None, nm_nbfwbnds=None,  # Number of mel-bands in the compressed noise mask (None: no compression)
+        fpdd=None, pdd_mceporder=None,   # Mel-cepstral order for compressing PDD spectrogram (typically 59; None: no compression)
+        fnm=None, nm_nbfwbnds=None,  # Number of mel-bands in the compressed noise mask (None: no compression)
         verbose=1):
 
     wav, fs, enc = sp.wavread(fwav)
@@ -273,24 +273,24 @@ def analysisf(fwav,
     if verbose>0: print('PM Analysis (dur={:.3f}s, fs={}Hz, f0 in [{},{}]Hz, shift={}s, dftlen={})'.format(len(wav)/float(fs), fs, f0_min, f0_max, shift, dftlen))
 
     f0s = None
-    if inf0txt_file:
-        f0s = np.loadtxt(inf0txt_file)
+    if finf0txt:
+        f0s = np.loadtxt(finf0txt)
 
     # read input f0 file in float32 (ljuvela)
-    if inf0bin_file:
-        f0s = np.fromfile(inf0bin_file, dtype=np.float32)
+    if finf0bin:
+        f0s = np.fromfile(finf0bin, dtype=np.float32)
 
     f0s = analysis_f0postproc(wav, fs, f0s, f0_min=f0_min, f0_max=f0_max, shift=shift, verbose=verbose)
 
-    if f0_file:
+    if ff0:
         f0_values = f0s[:,1]
-        if verbose>0: print('    Output F0 {} in: {}'.format(f0_values.shape, f0_file))
+        if verbose>0: print('    Output F0 {} in: {}'.format(f0_values.shape, ff0))
         if f0_log: f0_values = np.log(f0_values)
-        if os.path.dirname(f0_file)!='' and (not os.path.isdir(os.path.dirname(f0_file))): os.mkdir(os.path.dirname(f0_file))
-        f0_values.astype(np.float32).tofile(f0_file)
+        if os.path.dirname(ff0)!='' and (not os.path.isdir(os.path.dirname(ff0))): os.mkdir(os.path.dirname(ff0))
+        f0_values.astype(np.float32).tofile(ff0)
 
     SPEC = None
-    if spec_file:
+    if fspec:
         SPEC = analysis_spec(wav, fs, f0s, shift=shift, dftlen=dftlen, verbose=verbose)
         if not spec_mceporder is None:
             SPEC = sp.spec2mcep(SPEC, sp.bark_alpha(fs), order=spec_mceporder)
@@ -298,33 +298,33 @@ def analysisf(fwav,
             SPEC = sp.loghspec2fwcep(np.log(abs(SPEC)), fs, order=spec_fwceporder)
         if not spec_nbfwbnds is None:
             SPEC = sp.linbnd2fwbnd(np.log(abs(SPEC)), fs, dftlen, spec_nbfwbnds)
-        if verbose>0: print('    Output Spectrogram size={} in: {}'.format(SPEC.shape, spec_file))
-        if os.path.dirname(spec_file)!='' and (not os.path.isdir(os.path.dirname(spec_file))): os.mkdir(os.path.dirname(spec_file))
-        SPEC.astype(np.float32).tofile(spec_file)
+        if verbose>0: print('    Output Spectrogram size={} in: {}'.format(SPEC.shape, fspec))
+        if os.path.dirname(fspec)!='' and (not os.path.isdir(os.path.dirname(fspec))): os.mkdir(os.path.dirname(fspec))
+        SPEC.astype(np.float32).tofile(fspec)
 
     PDD = None
-    if pdd_file or nm_file:
+    if fpdd or fnm:
         PDD = analysis_pdd(wav, fs, f0s, dftlen=dftlen, verbose=verbose)
 
-    if pdd_file:
+    if fpdd:
         if not pdd_mceporder is None:
             # If asked, compress PDD
             PDD[PDD<0.001] = 0.001 # From COVAREP
             PDD = sp.spec2mcep(PDD, sp.bark_alpha(fs), pdd_mceporder)
-        if verbose>0: print('    Output PDD size={} in: {}'.format(PDD.shape, pdd_file))
-        if os.path.dirname(pdd_file)!='' and (not os.path.isdir(os.path.dirname(pdd_file))): os.mkdir(os.path.dirname(pdd_file))
-        PDD.astype(np.float32).tofile(pdd_file)
+        if verbose>0: print('    Output PDD size={} in: {}'.format(PDD.shape, fpdd))
+        if os.path.dirname(fpdd)!='' and (not os.path.isdir(os.path.dirname(fpdd))): os.mkdir(os.path.dirname(fpdd))
+        PDD.astype(np.float32).tofile(fpdd)
 
     NM = None
-    if nm_file:
+    if fnm:
         NM = analysis_nm(wav, fs, f0s, PDD, verbose=verbose)
         # If asked, compress NM
         if nm_nbfwbnds:
             # If asked, compress the noise mask using a number of mel bands
             NM = sp.linbnd2fwbnd(NM, fs, dftlen, nm_nbfwbnds)
-        if verbose>0: print('    Output Noise Mask size={} in: {}'.format(NM.shape, nm_file))
-        if os.path.dirname(nm_file)!='' and (not os.path.isdir(os.path.dirname(nm_file))): os.mkdir(os.path.dirname(nm_file))
-        NM.astype(np.float32).tofile(nm_file)
+        if verbose>0: print('    Output Noise Mask size={} in: {}'.format(NM.shape, fnm))
+        if os.path.dirname(fnm)!='' and (not os.path.isdir(os.path.dirname(fnm))): os.mkdir(os.path.dirname(fnm))
+        NM.astype(np.float32).tofile(fnm)
 
     if verbose>2:
         plot_features(wav=wav, fs=fs, f0s=f0s, SPEC=SPEC, PDD=PDD, NM=NM)
@@ -353,9 +353,9 @@ if  __name__ == "__main__" :
     analysisf(args.wavfile,
               shift=args.shift,
               dftlen=args.dftlen,
-              inf0txt_file=args.inf0txt, f0_min=args.f0_min, f0_max=args.f0_max, f0_file=args.f0, f0_log=args.f0_log,
-              inf0bin_file=args.inf0bin,
-              spec_file=args.spec, spec_mceporder=args.spec_mceporder, spec_nbfwbnds=args.spec_nbfwbnds,
-              pdd_file=args.pdd, pdd_mceporder=args.pdd_mceporder,
-              nm_file=args.nm, nm_nbfwbnds=args.nm_nbfwbnds,
+              finf0txt=args.inf0txt, f0_min=args.f0_min, f0_max=args.f0_max, ff0=args.f0, f0_log=args.f0_log,
+              finf0bin=args.inf0bin,
+              fspec=args.spec, spec_mceporder=args.spec_mceporder, spec_nbfwbnds=args.spec_nbfwbnds,
+              fpdd=args.pdd, pdd_mceporder=args.pdd_mceporder,
+              fnm=args.nm, nm_nbfwbnds=args.nm_nbfwbnds,
               verbose=args.verbose)
