@@ -36,16 +36,16 @@
 # Author
 #     Gilles Degottex <gad27@cam.ac.uk>
 
-.PRECIOUS: %.resynth.wav %.wav %.f0 %.spec %.pdd %.nm %.bndnm
+# .PRECIOUS: %.resynth.wav %.wav %.f0 %.spec %.pdd %.nm %.bndnm
 
-.PHONY: smoke
+.PHONY: test_fetch_data
 
-RESYNTHESIS=slt_arctic_a0010.resynth.wav bdl_arctic_a0020.resynth.wav clb_arctic_a0030.resynth.wav awb_arctic_a0040.resynth.wav
+# RESYNTHESIS=slt_arctic_a0010.resynth.wav bdl_arctic_a0020.resynth.wav clb_arctic_a0030.resynth.wav awb_arctic_a0040.resynth.wav
 
 all:
-	$(MAKE) samples.scp
-	$(MAKE) smoke
-	$(MAKE) ${RESYNTHESIS}
+	$(MAKE) test_fetch_data
+	# $(MAKE) smoke
+	# $(MAKE) ${RESYNTHESIS}
 
 samples.scp:
 	wget http://festvox.org/cmu_arctic/cmu_arctic/cmu_us_slt_arctic/wav/arctic_a0010.wav -O slt_arctic_a0010.wav
@@ -55,40 +55,16 @@ samples.scp:
 	ls *.wav |grep -v '.resynth.wav' > samples.scp
 
 
-smoke: samples.scp
-	# Use just one example
-	cp awb_arctic_a0040.wav smoke.wav
-	python ../analysis.py smoke.wav
-	python ../analysis.py smoke.wav --f0 smoke.f0
-	python ../analysis.py smoke.wav --f0 smoke.logf0 --f0_log
-	python ../analysis.py smoke.wav --spec smoke.spec
-	python ../analysis.py smoke.wav --pdd smoke.pdd
-	python ../analysis.py smoke.wav --nm smoke.nm
-	python ../analysis.py smoke.wav --nm smoke.bndnm --nm_nbfwbnds 25
-	# use sptk style binary input F0
-	python ../analysis.py smoke.wav --inf0bin smoke.f0 --nm smoke.bndnm --nm_nbfwbnds 25
-	python ../synthesis.py smoke.resynth.wav --fs 16000 --f0file smoke.f0 --spec smoke.spec
-	python ../synthesis.py smoke.resynth.wav --fs 16000 --logf0file smoke.logf0 --spec smoke.spec
-	python ../synthesis.py smoke.resynth.wav --fs 16000 --f0file smoke.f0 --specfile smoke.spec --pddfile smoke.pdd
-	python ../synthesis.py smoke.resynth.wav --fs 16000 --f0file smoke.f0 --specfile smoke.spec --nmfile smoke.nm
-	python ../synthesis.py smoke.resynth.wav --fs 16000 --f0file smoke.f0 --specfile smoke.spec --bndnmfile smoke.bndnm
-
-smoke_mcp:
-	python ../analysis.py smoke.wav --spec smoke.mcep --spec_mceporder 59
-	python ../analysis.py smoke.wav --pdd smoke.mpdd --spec_mceporder 59
-	python ../synthesis.py smoke.resynth.wav --fs 16000 --f0file smoke.f0 --mcepfile smoke.mcep
-	python ../synthesis.py smoke.resynth.wav --fs 16000 --f0file smoke.f0 --specfile smoke.spec --mpddfile smoke.mpdd
-
-smoke_nbfwbnds:
-	python ../analysis.py smoke.wav --spec smoke.fwspec --spec_nbfwbnds 129
-	python ../analysis.py smoke.wav --nm smoke.fwnm --nm_nbfwbnds 33
-	# python ../synthesis.py smoke.resynth.wav --fs 16000 --f0file smoke.f0 --mcepfile smoke.fwspec # TODO
-	# python ../synthesis.py smoke.resynth.wav --fs 16000 --f0file smoke.f0 --specfile smoke.spec --mpddfile smoke.mpdd # TODO
+# smoke_nbfwbnds:
+# 	python ../analysis.py smoke.wav --spec smoke.fwspec --spec_nbfwbnds 129
+# 	python ../analysis.py smoke.wav --nm smoke.fwnm --nm_nbfwbnds 33
+# 	# python ../synthesis.py smoke.resynth.wav --fs 16000 --f0file smoke.f0 --mcepfile smoke.fwspec # TODO
+# 	# python ../synthesis.py smoke.resynth.wav --fs 16000 --f0file smoke.f0 --specfile smoke.spec --mpddfile smoke.mpdd # TODO
 
 # Analysis ---------------------------------------------------------------------
 
-%.f0 %.spec %.pdd: %.wav ../analysis.py
-	@python ../analysis.py $< --f0 $(<:.wav=.f0) --spec $(<:.wav=.spec) --pdd $(<:.wav=.pdd)
+# %.f0 %.spec %.pdd: %.wav ../analysis.py
+	# @python ../analysis.py $< --f0 $(<:.wav=.f0) --spec $(<:.wav=.spec) --pdd $(<:.wav=.pdd)
 
 # # You can use this rule if you want to skip PDD and use the noisemask
 # %.f0 %.spec %.nm: %.wav ../analysis.py
@@ -105,8 +81,8 @@ smoke_nbfwbnds:
 
 # Synthesis --------------------------------------------------------------------
 
-%.resynth.wav: %.f0 %.spec %.pdd ../synthesis.py
-	@python ../synthesis.py $@ --f0file $< --specfile $(<:.f0=.spec) --pddfile $(<:.f0=.pdd) --fs 16000
+# %.resynth.wav: %.f0 %.spec %.pdd ../synthesis.py
+	# @python ../synthesis.py $@ --f0file $< --specfile $(<:.f0=.spec) --pddfile $(<:.f0=.pdd) --fs 16000
 
 # # You can use this rule if you want to skip PDD and use the noisemask
 # %.resynth.wav: %.f0 %.spec %.nm ../synthesis.py
@@ -117,21 +93,21 @@ smoke_nbfwbnds:
 # 	@python ../synthesis.py $@ --f0file $< --specfile $(<:.f0=.spec) --noisemaskfile $(<:.f0=.bndnm) --noisemask_nbbnds 21 --fs 16000 # TODO
 
 clean:
-	rm -f *.resynth.wav *.f0 *.logf0 *.spec *.pdd *.mpdd *.nm *.bndnm *.diff
+	rm -f *.resynth.wav *.f0 *.lf0 *.logf0 *.spec *.fwspec *.pdd *.mpdd *.nm *.bndnm *.fwnm *.diff
 
 distclean:
-	rm -f samples.scp *.wav *.f0 *.logf0 *.spec *.pdd *.mpdd *.nm *.bndnm *.diff
+	rm -f samples.scp *.wav *.f0 *.lf0 *.logf0 *.spec *.fwspec *.pdd *.mpdd *.nm *.bndnm *.fwnm *.diff
 
 
 # For debugging purpose --------------------------------------------------------
-.PHONY: testref makeref
+# .PHONY: testref makeref
 
-%.resynth.diff: %.resynth.wav %.resynth.ref.wav
-	cmp $^ > $@
+# %.resynth.diff: %.resynth.wav %.resynth.ref.wav
+	# cmp $^ > $@
 
-testref: $(RESYNTHESIS:.resynth.wav=.resynth.diff)
-	$(NOOP)
+# testref: $(RESYNTHESIS:.resynth.wav=.resynth.diff)
+	# $(NOOP)
 
-makeref:
-	$(foreach f,$(RESYNTHESIS),cp -f $(f) $(f:.resynth.wav=.resynth.ref.wav);)
-	rm -f $(RESYNTHESIS:.resynth.wav=.resynth.diff)
+# makeref:
+	# $(foreach f,$(RESYNTHESIS),cp -f $(f) $(f:.resynth.wav=.resynth.ref.wav);)
+	# rm -f $(RESYNTHESIS:.resynth.wav=.resynth.diff)
