@@ -280,7 +280,7 @@ def synthesize(fs, f0s, SPEC, NM=None, wavlen=None
 
 
 
-def synthesizef(fs, shift=0.005, dftlen=4096, ff0=None, flf0=None, fspec=None, ffwcep=None, fmcep=None, fpdd=None, fmpdd=None, fnm=None, fbndnm=None, nm_cont=False, fsyn=None, verbose=1):
+def synthesizef(fs, shift=0.005, dftlen=4096, ff0=None, flf0=None, fspec=None, ffwlspec=None, ffwcep=None, fmcep=None, fpdd=None, fmpdd=None, fnm=None, ffwnm=None, nm_cont=False, fsyn=None, verbose=1):
     '''
     Call the synthesis from python using file inputs and outputs
     '''
@@ -295,6 +295,10 @@ def synthesizef(fs, shift=0.005, dftlen=4096, ff0=None, flf0=None, fspec=None, f
     if fspec:
         SPEC = np.fromfile(fspec, dtype=np.float32)
         SPEC = SPEC.reshape((len(f0), -1))
+    if ffwlspec:
+        FWLSPEC = np.fromfile(ffwlspec, dtype=np.float32)
+        FWLSPEC = FWLSPEC.reshape((len(f0), -1))
+        SPEC = np.exp(sp.fwbnd2linbnd(FWLSPEC, fs, dftlen, smooth=True))
     if ffwcep:
         FWCEP = np.fromfile(ffwcep, dtype=np.float32)
         FWCEP = FWCEP.reshape((len(f0), -1))
@@ -324,10 +328,10 @@ def synthesizef(fs, shift=0.005, dftlen=4096, ff0=None, flf0=None, fspec=None, f
     if fnm:
         NM = np.fromfile(fnm, dtype=np.float32)
         NM = NM.reshape((len(f0), -1))
-    if fbndnm:
-        BNDNM = np.fromfile(fbndnm, dtype=np.float32)
-        BNDNM = BNDNM.reshape((len(f0), -1))
-        NM = sp.fwbnd2linbnd(BNDNM, fs, dftlen)
+    if ffwnm:
+        FWNM = np.fromfile(ffwnm, dtype=np.float32)
+        FWNM = FWNM.reshape((len(f0), -1))
+        NM = sp.fwbnd2linbnd(FWNM, fs, dftlen)
 
     syn = synthesize(fs, f0s, SPEC, NM=NM, nm_cont=nm_cont, verbose=verbose)
     if fsyn:
@@ -341,16 +345,17 @@ if  __name__ == "__main__" :
     '''
 
     argpar = argparse.ArgumentParser()
-    argpar.add_argument("synthfile", help="Output synthesis file")
-    argpar.add_argument("--f0file", default=None, help="Input f0[Hz] file")
-    argpar.add_argument("--logf0file", default=None, help="Input f0[log Hz] file")
-    argpar.add_argument("--specfile", default=None, help="Input amplitude spectrogram [linear values]")
-    argpar.add_argument("--fwcepfile", default=None, help="Input amplitude spectrogram [frequency warped cepstrum values]")
-    argpar.add_argument("--mcepfile", default=None, help="Input amplitude spectrogram [mel-cepstrum values]")
-    argpar.add_argument("--pddfile", default=None, help="Input Phase Distortion Deviation file [linear values]")
-    argpar.add_argument("--mpddfile", default=None, help="Input Phase Distortion Deviation file [mel-cepstrum values]")
-    argpar.add_argument("--nmfile", default=None, help="Output Noise Mask [linear values in [0,1] ]")
-    argpar.add_argument("--bndnmfile", default=None, help="Output Noise Mask [compressed in bands with values still in [0,1] ]")
+    argpar.add_argument("synth", help="Output synthesis file")
+    argpar.add_argument("--f0", default=None, help="Input f0[Hz] file")
+    argpar.add_argument("--logf0", default=None, help="Input f0[log Hz] file")
+    argpar.add_argument("--spec", default=None, help="Input amplitude spectrogram [linear values]")
+    argpar.add_argument("--fwlspec", default=None, help="Input amplitude spectrogram [frequency warped log spectral values]")
+    argpar.add_argument("--fwcep", default=None, help="Input amplitude spectrogram [frequency warped cepstrum values]")
+    argpar.add_argument("--mcep", default=None, help="Input amplitude spectrogram [mel-cepstrum values]")
+    argpar.add_argument("--pdd", default=None, help="Input Phase Distortion Deviation file [linear values]")
+    argpar.add_argument("--mpdd", default=None, help="Input Phase Distortion Deviation file [mel-cepstrum values]")
+    argpar.add_argument("--nm", default=None, help="Output Noise Mask [linear values in [0,1] ]")
+    argpar.add_argument("--fwnm", default=None, help="Output Noise Mask [compressed in bands with values still in [0,1] ]")
     argpar.add_argument("--nm_cont", action='store_true', help="Allow continuous values for the noisemask (def. False)")
     argpar.add_argument("--fs", default=16000, type=int, help="Sampling frequency[Hz]")
     argpar.add_argument("--shift", default=0.005, type=float, help="Time step[s] between the frames")
@@ -359,4 +364,4 @@ if  __name__ == "__main__" :
     args = argpar.parse_args()
     args.dftlen = 4096
 
-    synthesizef(args.fs, shift=args.shift, dftlen=args.dftlen, ff0=args.f0file, flf0=args.logf0file, fspec=args.specfile, ffwcep=args.fwcepfile, fmcep=args.mcepfile, fnm=args.nmfile, fbndnm=args.bndnmfile, nm_cont=args.nm_cont, fpdd=args.pddfile, fmpdd=args.mpddfile, fsyn=args.synthfile, verbose=args.verbose)
+    synthesizef(args.fs, shift=args.shift, dftlen=args.dftlen, ff0=args.f0, flf0=args.logf0, fspec=args.spec, ffwlspec=args.fwlspec, ffwcep=args.fwcep, fmcep=args.mcep, fnm=args.nm, ffwnm=args.fwnm, nm_cont=args.nm_cont, fpdd=args.pdd, fmpdd=args.mpdd, fsyn=args.synth, verbose=args.verbose)
