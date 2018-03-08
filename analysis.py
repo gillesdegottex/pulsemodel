@@ -75,6 +75,8 @@ def analysis_f0postproc(wav, fs, f0s=None, f0_min=60, f0_max=600,
     f0s = sp.f0s_rmsteps(f0s)
     # Resample the given f0 to regular intervals
     if np.std(np.diff(f0s[:,0]))>2*np.finfo(f0s[0,0]).resolution:
+        warnings.warn('''\n\nWARNING: F0 curve seems to be sampled non-uniformly.
+         It will be resampled at {}s intervals.'''.format(shift), RuntimeWarning)
         f0s = sp.f0s_resample_cst(f0s, shift)
 
     return f0s
@@ -216,7 +218,8 @@ def analysis(wav, fs, f0s=None, f0_min=60, f0_max=600,
 
     return f0s, SPEC, PDD, NM
 
-def plot_features(wav=None, fs=None, f0s=None, SPEC=None, PDD=None, NM=None):
+def plot_features(wav=None, fs=None, f0s=None, SPEC=None, PDD=None, NM=None): # pragma: no cover
+    # TODO Could test this by writting in a picture
     tstart = 0.0
     tend = 1.0
     nbview = 0
