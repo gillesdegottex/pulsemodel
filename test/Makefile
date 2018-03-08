@@ -1,19 +1,4 @@
-# Run analysis/re-synthesis (copy-synthesis) on some samples
-#
-# Description
-#   * To run all the tests, you need the following executable:
-#     reaper (https://github.com/google/REAPER)
-#     mcep and mgc2sp (http://sp-tk.sourceforge.net/)
-#   * For the sake of completness this script is extracting a spectral envelope
-#     (somestimes called spectrogram in vocoding) (named $FILENAME.spec below)
-#     The used method is a SIMPLISTIC NASTY IDIOTIC Linear interpolation.
-#     Thus, please replace this envelope by a better one.
-#     (e.g. that of STRAIGHT vocoder)
-#   * This script uses pre-computed f0 files for waveforms that are downloaded
-#     from the CMU Arctic databases (http://festvox.org/cmu_arctic/cmu_arctic/).
-#     If REAPER F0 estimator is installed (https://github.com/google/REAPER)
-#     , you can also generate the f0 using the analysis.py script directly
-#     (see below for the rule commented).
+# Prepare or clean data for tests
 #
 # Usage
 # 	$ make
