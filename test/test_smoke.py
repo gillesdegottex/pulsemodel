@@ -65,6 +65,11 @@ class TestSmoke(unittest.TestCase):
 
         _ = pulsemodel.analysis_f0postproc(wav, fs, f0s=f0s[:,1], f0_min=f0_min, f0_max=f0_max, shift=shift, verbose=verbose)
 
+        nonunif0s = f0s.copy()
+        nonunif0s[:,0] = np.random.rand(f0s.shape[0])*(f0s[-1,0]-f0s[0,0]) + f0s[0,0]
+        nonunif0s[:,0] = np.sort(nonunif0s[:,0])
+        _ = pulsemodel.analysis_f0postproc(wav, fs, f0s=nonunif0s, f0_min=f0_min, f0_max=f0_max, shift=shift, verbose=verbose)
+
         f0s = pulsemodel.analysis_f0postproc(wav, fs, f0_min=f0_min, f0_max=f0_max, shift=shift, verbose=verbose)
 
         f0_min = 60
