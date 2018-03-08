@@ -260,7 +260,7 @@ def synthesize(fs, f0s, SPEC, NM=None, wavlen=None
 
     if verbose>1: print '\r                                                               \r',
 
-    if verbose>2:
+    if verbose>2:                                             # pragma: no cover
         import matplotlib.pyplot as plt
         plt.ion()
         f, axs = plt.subplots(3, 1, sharex=True, sharey=False)
