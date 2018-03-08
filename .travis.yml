@@ -1,3 +1,8 @@
+cache:
+  directories:
+    - $HOME/.cache/pip
+
+
 language: python
 
 os:
@@ -20,7 +25,7 @@ before_install:
     - echo $TRAVIS_TAG
     - export TRAVIS_TAG=`git describe --tags --exact-match HEAD 2>/dev/null`
     - echo $TRAVIS_TAG
-    
+
     - sudo apt-get -qq update
     - sudo apt-get install -y cython
     - sudo apt-get install -y python-numpy
@@ -28,6 +33,7 @@ before_install:
 
 install:
     - echo "install..."
+    - pip install codecov
     - pip install cython
     - pip install numpy
     - pip install scipy
@@ -47,14 +53,20 @@ script:
     - rm -fr ../pulsemodel_source_build/external/pyworld/lib/World/.git*
     - cp -fr ../pulsemodel_source_build pulsemodel
 
-    - cp -fr ../pulsemodel_source_build pulsemodel_test
-    - cd pulsemodel_test
-    - make test
-    - cd ..
-
     - zip -r $PACKAGENAME pulsemodel
     - ls
     - ls -l $PACKAGENAME
+
+    # Now test the package that we just built
+    - cd pulsemodel
+    - make test_fetch_data
+    - pwd
+    - coverage run --source=. --omit="test/*","external/*" test/test_smoke.py
+    - cd ..
+
+
+after_success:
+    - codecov
 
 
 deploy:
