@@ -73,10 +73,10 @@ def synthesize(fs, f0s, SPEC, NM=None, wavlen=None
 
     # Check the size of the inputs
     if f0s.shape[0]!=SPEC.shape[0]:
-        raise ValueError('F0 size {} and spectrogram size {} do not match'.format(len(f0), SPEC.shape[0]))
+        raise ValueError('F0 size {} and spectrogram size {} do not match'.format(len(f0), SPEC.shape[0])) # pragma: no cover
     if not NM is None:
         if SPEC.shape!=NM.shape:
-            raise ValueError('spectrogram size {} and NM size {} do not match.'.format(SPEC.shape, NM.shape))
+            raise ValueError('spectrogram size {} and NM size {} do not match.'.format(SPEC.shape, NM.shape)) # pragma: no cover
 
     if wavlen==None: wavlen = int(np.round(f0s[-1,0]*fs))
     dftlen = (SPEC.shape[1]-1)*2
@@ -172,7 +172,7 @@ def synthesize(fs, f0s, SPEC, NM=None, wavlen=None
         winlen = int(np.max((0.050*fs, nbper*fs/f0))/2)*2+1 # Has to be odd
         # TODO We also assume that the VTF's decay is shorter
         #      than nbper-1 periods (dangerous with high pitched tense voice).
-        if winlen>dftlen: raise ValueError('winlen({})>dftlen({})'.format(winlen, dftlen))
+        if winlen>dftlen: raise ValueError('winlen({})>dftlen({})'.format(winlen, dftlen)) # pragma: no cover
 
         # Set the rough position of the pulse in the window (the closest sample)
         # We keep a third of the window (1 period) on the left because the
