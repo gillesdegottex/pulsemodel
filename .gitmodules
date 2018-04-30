@@ -6,4 +6,4 @@
 	url = https://github.com/gillesdegottex/REAPER.git
 [submodule "external/pyworld"]
 	path = external/pyworld
-	url = git@github.com:JeremyCCHsu/Python-Wrapper-for-World-Vocoder.git
+	url = https://github.com:JeremyCCHsu/Python-Wrapper-for-World-Vocoder.git
