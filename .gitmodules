@@ -1,9 +1,6 @@
 [submodule "sigproc"]
 	path = sigproc
 	url = https://github.com/gillesdegottex/sigproc.git
-[submodule "external/pyworld"]
-	path = external/pyworld
-	url = https://github.com/JeremyCCHsu/Python-Wrapper-for-World-Vocoder.git
 [submodule "external/REAPER"]
 	path = external/REAPER
 	url = https://github.com/gillesdegottex/REAPER.git
