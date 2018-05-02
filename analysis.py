@@ -110,6 +110,7 @@ def analysis_spec(wav, fs, f0s,
 
         # Then try WORLD vocoder
         import pyworld
+        wav = np.ascontiguousarray(wav)
         #_f0, ts = pyworld.dio(x, fs, frame_period=shift*1000)    # raw pitch extractor # Use REAPER instead
         pwts = np.ascontiguousarray(f0s[:,0])
         pwf0 = pyworld.stonemask(wav, np.ascontiguousarray(f0s[:,1]), pwts, fs)  # pitch refinement
