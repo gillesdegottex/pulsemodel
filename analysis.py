@@ -210,7 +210,7 @@ def analysis(wav, fs, f0s=None, f0_min=60, f0_max=600,
              dftlen=4096,    # You can adapt this one according to your pipeline
              verbose=1):
 
-    if verbose>0: print('PM Analysis (dur={:.3f}s, fs={}Hz, f0 in [{},{}]Hz, shift={}s, dftlen={})'.format(len(wav)/float(fs), fs, f0_min, f0_max, shift, dftlen))
+    if verbose>0: print('PML Analysis (dur={:.3f}s, fs={}Hz, f0 in [{},{}]Hz, shift={}s, dftlen={})'.format(len(wav)/float(fs), fs, f0_min, f0_max, shift, dftlen))
 
     f0s = analysis_f0postproc(wav, fs, f0s, f0_min=f0_min, f0_max=f0_max, shift=shift, verbose=verbose)
 
@@ -255,11 +255,11 @@ def plot_features(wav=None, fs=None, f0s=None, SPEC=None, PDD=None, NM=None): # 
         axs[view].grid()
         view+=1
     if not SPEC is None:
-        axs[view].imshow(sp.mag2db(SPEC).T, origin='lower', aspect='auto', interpolation='none', extent=(tstart, tend, 0, 0.5*fs))
+        axs[view].imshow(sp.mag2db(SPEC).T, origin='lower', aspect='auto', interpolation='none', extent=(tstart, tend, 0, 0.5*fs), cmap='jet')
         axs[view].set_ylabel('Amp. Envelope\nFrequency [Hz]')
         view+=1
     if not PDD is None:
-        axs[view].imshow(PDD.T, origin='lower', aspect='auto', interpolation='none', extent=(tstart, tend, 0, 0.5*fs), vmin=0.0, vmax=2.0)
+        axs[view].imshow(PDD.T, origin='lower', aspect='auto', interpolation='none', extent=(tstart, tend, 0, 0.5*fs), cmap='jet', vmin=0.0, vmax=2.0)
         axs[view].set_ylabel('PDD\nFrequency [Hz]')
         view+=1
     if not NM is None:
@@ -285,7 +285,8 @@ def analysisf(fwav,
 
     wav, fs, _ = sp.wavread(fwav)
 
-    if verbose>0: print('PM Analysis (dur={:.3f}s, fs={}Hz, f0 in [{},{}]Hz, shift={}s, dftlen={})'.format(len(wav)/float(fs), fs, f0_min, f0_max, shift, dftlen))
+    if verbose>0: print('PML Analysis (dur={:.3f}s, fs={}Hz, f0 in [{},{}]Hz, shift={}s, dftlen={})'.format(len(wav)/float(fs), fs, f0_min, f0_max, shift, dftlen))
+
     if not preproc_hp is None:
         if verbose>0: print('    High-pass filter the waveform (cutt-off={}Hz)'.format(preproc_hp))
         b, a = sig.butter(4, preproc_hp/(fs/0.5), btype='high')
@@ -300,6 +301,7 @@ def analysisf(fwav,
         f0s = np.fromfile(finf0bin, dtype=np.float32)
 
     f0s = analysis_f0postproc(wav, fs, f0s, f0_min=f0_min, f0_max=f0_max, shift=shift, verbose=verbose)
+    if verbose>2: f0sori=f0s.copy()
 
     if ff0:
         f0_values = f0s[:,1]
@@ -311,6 +313,7 @@ def analysisf(fwav,
     SPEC = None
     if fspec:
         SPEC = analysis_spec(wav, fs, f0s, shift=shift, dftlen=dftlen, verbose=verbose)
+        if verbose>2: SPECori=SPEC.copy()
         if not spec_mceporder is None: # pragma: no cover
                                        # Cannot test this because it needs SPTK
             SPEC = sp.spec2mcep(SPEC, sp.bark_alpha(fs), order=spec_mceporder)
@@ -325,6 +328,7 @@ def analysisf(fwav,
     PDD = None
     if fpdd or fnm:
         PDD = analysis_pdd(wav, fs, f0s, dftlen=dftlen, verbose=verbose)
+        if verbose>2: PDDori=PDD.copy()
 
     if fpdd:
         if not pdd_mceporder is None:  # pragma: no cover
@@ -337,8 +341,10 @@ def analysisf(fwav,
         PDD.astype(np.float32).tofile(fpdd)
 
     NM = None
+    if verbose>2: NMori=None
     if fnm:
         NM = analysis_nm(wav, fs, f0s, PDD, verbose=verbose)
+        if verbose>2: NMori=NM.copy()
         # If asked, compress NM
         if nm_nbfwbnds:
             # If asked, compress the noise mask using a number of mel bands
@@ -348,7 +354,7 @@ def analysisf(fwav,
         NM.astype(np.float32).tofile(fnm)
 
     if verbose>2:
-        plot_features(wav=wav, fs=fs, f0s=f0s, SPEC=SPEC, PDD=PDD, NM=NM) # pragma: no cover
+        plot_features(wav=wav, fs=fs, f0s=f0sori, SPEC=SPECori, PDD=PDDori, NM=NMori) # pragma: no cover
 
 def main(argv):
     argpar = argparse.ArgumentParser()

@@ -85,7 +85,7 @@ def synthesize(fs, f0s, SPEC, NM=None, wavlen=None
     dftlen = (SPEC.shape[1]-1)*2
     shift = np.median(np.diff(f0s[:,0]))
     if verbose>0:
-        print('PM Synthesis (dur={}s, fs={}Hz, f0 in [{:.0f},{:.0f}]Hz, shift={}s, dftlen={})'.format(wavlen/float(fs), fs, np.min(f0s[:,1]), np.max(f0s[:,1]), shift, dftlen))
+        print('PML Synthesis (dur={}s, fs={}Hz, f0 in [{:.0f},{:.0f}]Hz, shift={}s, dftlen={})'.format(wavlen/float(fs), fs, np.min(f0s[:,1]), np.max(f0s[:,1]), shift, dftlen))
 
 
     # Prepare the features
