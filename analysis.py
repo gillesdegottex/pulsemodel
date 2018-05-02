@@ -39,6 +39,7 @@ import warnings
 
 import numpy as np
 np.random.seed(123) # Generate always the same "random" numbers, for debugging.
+from scipy import signal as sig
 
 import sigproc as sp
 import sigproc.pystraight
@@ -278,11 +279,16 @@ def analysisf(fwav,
         spec_nbfwbnds=None,  # Number of mel-bands in the compressed half log spectrogram (None: no compression)
         fpdd=None, pdd_mceporder=None,   # Mel-cepstral order for compressing PDD spectrogram (typically 59; None: no compression)
         fnm=None, nm_nbfwbnds=None,  # Number of mel-bands in the compressed noise mask (None: no compression)
+        preproc_hp=None, # Cut-off of high-pass filter (e.g. 20Hz)
         verbose=1):
 
     wav, fs, _ = sp.wavread(fwav)
 
     if verbose>0: print('PM Analysis (dur={:.3f}s, fs={}Hz, f0 in [{},{}]Hz, shift={}s, dftlen={})'.format(len(wav)/float(fs), fs, f0_min, f0_max, shift, dftlen))
+    if not preproc_hp is None:
+        if verbose>0: print('    High-pass filter the waveform (cutt-off={}Hz)'.format(preproc_hp))
+        b, a = sig.butter(4, preproc_hp/(fs/0.5), btype='high')
+        wav = sig.filtfilt(b, a, wav)
 
     f0s = None
     if finf0txt:
