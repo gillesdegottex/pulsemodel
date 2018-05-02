@@ -272,7 +272,7 @@ def plot_features(wav=None, fs=None, f0s=None, SPEC=None, PDD=None, NM=None): # 
 def analysisf(fwav,
         shift=0.005,
         dftlen=4096,
-        finf0txt=None, f0_min=60, f0_max=600, ff0=None, f0_log=False,
+        finf0txt=None, f0estimator='REAPER', f0_min=60, f0_max=600, ff0=None, f0_log=False,
         finf0bin=None, # input f0 file in binary
         fspec=None,
         spec_mceporder=None, # Mel-cepstral order for compressing the spectrogram (typically 59; None: no compression)
