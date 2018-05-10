@@ -281,11 +281,18 @@ def analysisf(fwav,
         fpdd=None, pdd_mceporder=None,   # Mel-cepstral order for compressing PDD spectrogram (typically 59; None: no compression)
         fnm=None, nm_nbfwbnds=None,  # Number of mel-bands in the compressed noise mask (None: no compression)
         preproc_hp=None, # Cut-off of high-pass filter (e.g. 20Hz)
+        preproc_fs=None,
         verbose=1):
 
     wav, fs, _ = sp.wavread(fwav)
 
+
     if verbose>0: print('PML Analysis (dur={:.3f}s, fs={}Hz, f0 in [{},{}]Hz, shift={}s, dftlen={})'.format(len(wav)/float(fs), fs, f0_min, f0_max, shift, dftlen))
+
+    if (not preproc_fs is None) and (preproc_fs!=fs):
+        if verbose>0: print('    Resampling the waveform (new fs={}Hz)'.format(preproc_fs))
+        wav = sp.resample(wav, fs, preproc_fs, method=2, deterministic=True)
+        fs = preproc_fs
 
     if not preproc_hp is None:
         if verbose>0: print('    High-pass filter the waveform (cutt-off={}Hz)'.format(preproc_hp))
