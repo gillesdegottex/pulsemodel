@@ -52,12 +52,14 @@ sys.path.insert(0, os.path.join(os.path.split(os.path.realpath(__file__))[0],'ex
 
 def analysis_f0postproc(wav, fs, f0s=None, f0_min=60, f0_max=600,
              shift=0.005,        # Usually 5ms
+             f0estimator='REAPER',
              verbose=1):
     '''
     Post process the F0 estimate.
     If f0s==None, an F0 estimate is extracted using REAPER.
     '''
     if f0s is None:
+        # TODO Switch f0 estimator using `f0estimator`
         f0s = sigproc.interfaces.reaper(wav, fs, shift, f0_min, f0_max)
 
     # If only values are given, make two column matrix [time[s], value[Hz]] (ljuvela)
@@ -205,14 +207,14 @@ def analysis_nm(wav, fs,
 
     return NM
 
-def analysis(wav, fs, f0s=None, f0_min=60, f0_max=600,
+def analysis(wav, fs, f0s=None, f0_min=60, f0_max=600, f0estimator='REAPER',
              shift=0.005,    # Usually 5ms
              dftlen=4096,    # You can adapt this one according to your pipeline
              verbose=1):
 
     if verbose>0: print('PML Analysis (dur={:.3f}s, fs={}Hz, f0 in [{},{}]Hz, shift={}s, dftlen={})'.format(len(wav)/float(fs), fs, f0_min, f0_max, shift, dftlen))
 
-    f0s = analysis_f0postproc(wav, fs, f0s, f0_min=f0_min, f0_max=f0_max, shift=shift, verbose=verbose)
+    f0s = analysis_f0postproc(wav, fs, f0s, f0_min=f0_min, f0_max=f0_max, shift=shift, f0estimator=f0estimator, verbose=verbose)
 
     SPEC = analysis_spec(wav, fs, f0s, shift=shift, dftlen=dftlen, verbose=verbose)
 
@@ -307,7 +309,7 @@ def analysisf(fwav,
     if finf0bin:
         f0s = np.fromfile(finf0bin, dtype=np.float32)
 
-    f0s = analysis_f0postproc(wav, fs, f0s, f0_min=f0_min, f0_max=f0_max, shift=shift, verbose=verbose)
+    f0s = analysis_f0postproc(wav, fs, f0s, f0_min=f0_min, f0_max=f0_max, shift=shift, f0estimator=f0estimator, verbose=verbose)
     if verbose>2: f0sori=f0s.copy()
 
     if ff0:
