@@ -280,8 +280,8 @@ def analysisf(fwav,
         spec_nbfwbnds=None,  # Number of mel-bands in the compressed half log spectrogram (None: no compression)
         fpdd=None, pdd_mceporder=None,   # Mel-cepstral order for compressing PDD spectrogram (typically 59; None: no compression)
         fnm=None, nm_nbfwbnds=None,  # Number of mel-bands in the compressed noise mask (None: no compression)
+        preproc_fs=None, # Resample the waveform
         preproc_hp=None, # Cut-off of high-pass filter (e.g. 20Hz)
-        preproc_fs=None,
         verbose=1):
 
     wav, fs, _ = sp.wavread(fwav)
