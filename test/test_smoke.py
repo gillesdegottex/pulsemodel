@@ -41,6 +41,10 @@ class TestSmoke(unittest.TestCase):
         analysis.main(['test/'+fname, '--nm', 'test/'+fname.replace('.wav','.nm')])
         analysis.main(['test/'+fname, '--nm_nbfwbnds', '33', '--nm', 'test/'+fname.replace('.wav','.fwnm')])
 
+        # Test preprocessing
+        analysis.main(['test/'+fname, '--inf0txt', 'test/'+fname.replace('.wav','.f0txt'), '--spec', 'test/'+fname.replace('.wav','.spec'), '--preproc_fs', 16000])
+        analysis.main(['test/'+fname, '--inf0txt', 'test/'+fname.replace('.wav','.f0txt'), '--spec', 'test/'+fname.replace('.wav','.spec'), '--preproc_hp', 100.0])
+
         # TODO Test various sampling fromats, encoding and sampling rates for wav files
 
     @classmethod
