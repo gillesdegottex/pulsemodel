@@ -382,6 +382,8 @@ def main(argv):
     argpar.add_argument("--pdd_mceporder", default=None, type=int, help="Cepstral order for PDD (None:uncompressed; typically 59)")
     argpar.add_argument("--nm", default=None, help="Output noise mask (for PML vocoder)")
     argpar.add_argument("--nm_nbfwbnds", default=None, type=int, help="Number of mel-bands in the compressed noise mask (None:uncompressed; typically 33)")
+    argpar.add_argument("--preproc_fs", default=None, type=float, help="[Hz] Resample the waveform before analysis.")
+    argpar.add_argument("--preproc_hp", default=None, type=float, help="[Hz] High-pass the waveform before analysis.")
     argpar.add_argument("--verbose", default=1, type=int, help="Output some information")
     args = argpar.parse_args(argv)
 
@@ -393,6 +395,7 @@ def main(argv):
               fspec=args.spec, spec_mceporder=args.spec_mceporder, spec_fwceporder=args.spec_fwceporder, spec_nbfwbnds=args.spec_nbfwbnds,
               fpdd=args.pdd, pdd_mceporder=args.pdd_mceporder,
               fnm=args.nm, nm_nbfwbnds=args.nm_nbfwbnds,
+              preproc_fs=args.preproc_fs, preproc_hp=args.preproc_hp,
               verbose=args.verbose)
 
 if  __name__ == "__main__" :            # pragma: no cover
