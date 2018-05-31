@@ -155,7 +155,7 @@ class TestSmoke(unittest.TestCase):
                 # #_f0, ts = pyworld.dio(x, fs, frame_period=shift*1000)    # raw pitch extractor # Use REAPER instead
                 # wav, fs, enc = sp.wavread(fname)
                 #
-                # pwts = 0.005*np.arange(len(lf0s)) # TODO TODO TODO 0.005
+                # pwts = 0.005*np.arange(len(lf0s))
                 # dftlen = 4096
                 # # from IPython.core.debugger import  Pdb; Pdb().set_trace()
                 # dlf0s = lf0s.astype(np.float64)
