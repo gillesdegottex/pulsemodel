@@ -1,6 +1,6 @@
 [submodule "sigproc"]
 	path = sigproc
-	url = https://github.com/gillesdegottex/sigproc.git
+	url = https://gitlab.com/gillesdegottex/sigproc.git
 [submodule "external/REAPER"]
 	path = external/REAPER
 	url = https://github.com/gillesdegottex/REAPER.git
