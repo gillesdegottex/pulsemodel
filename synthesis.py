@@ -47,12 +47,16 @@ Author
 
 import argparse
 import sys
+import warnings
 
 import numpy as np
 np.random.seed(123) # Generate always the same "random" numbers, for debugging.
 import scipy
 
 import sigproc as sp
+
+def getwinlen(f0, fs, nbper):
+    return int(np.max((0.050*fs, nbper*fs/f0))/2)*2+1   # Has to be odd
 
 def synthesize(fs, f0s, SPEC, NM=None, wavlen=None
                 , ener_multT0=False
@@ -66,6 +70,8 @@ def synthesize(fs, f0s, SPEC, NM=None, wavlen=None
                 , pp_f0_smooth=None   # Smooth the f0 curve using median and FIR filters of given window duration [s]
                 , pp_atten1stharminsilences=None # Typical value is -25
                 , verbose=1):
+
+    winnbper = 4    # Number of periods in a synthesis windows. It still contains only one single pulse, but leaves space for the VTF to decay without being cut abruptly.
 
     # Copy the inputs to avoid modifying them
     f0s = f0s.copy()
@@ -87,7 +93,6 @@ def synthesize(fs, f0s, SPEC, NM=None, wavlen=None
     if verbose>0:
         print('PML Synthesis (dur={}s, fs={}Hz, f0 in [{:.0f},{:.0f}]Hz, shift={}s, dftlen={})'.format(wavlen/float(fs), fs, np.min(f0s[:,1]), np.max(f0s[:,1]), shift, dftlen))
 
-
     # Prepare the features
 
     # Enforce continuous f0
@@ -106,6 +111,11 @@ def synthesize(fs, f0s, SPEC, NM=None, wavlen=None
         bcoefs = bcoefs/sum(bcoefs)
         lf0 = sig.filtfilt(bcoefs, [1], lf0)
         f0s[:,1] = np.exp(lf0)
+
+    winlenmax = getwinlen(np.min(f0s[:,1]), fs, winnbper)
+    if winlenmax>dftlen:
+        warnings.warn('\n\nWARNING: The maximum window length ({}) is bigger than the DFT length ({}). Please, increase the DFT length of your spectral features (the second dimension) or check if the f0 curve has extremly low values and try to clip them to higher values (at least higher than 50Hz). The f0 curve has been clipped to {}Hz.\n\n'.format(winlenmax, dftlen, winnbper*fs/float(dftlen))) # pragma: no cover
+        f0s[:,1] = np.clip(f0s[:,1], winnbper*fs/float(dftlen-2), 1e6)
 
     if not NM is None:
         # Remove noise below f0, as it is supposed to be already the case
@@ -169,19 +179,18 @@ def synthesize(fs, f0s, SPEC, NM=None, wavlen=None
         if verbose>1: print "\rPM Synthesis (python) t={:4.3f}s f0={:3.3f}Hz               ".format(t,f0),
 
         # Window's length
-        nbper = 4
         # TODO It should be ensured that the beggining and end of the
         #      noise is within the window. Nothing is doing this currently!
-        winlen = int(np.max((0.050*fs, nbper*fs/f0))/2)*2+1 # Has to be odd
+        winlen = getwinlen(f0, fs, winnbper)
         # TODO We also assume that the VTF's decay is shorter
-        #      than nbper-1 periods (dangerous with high pitched tense voice).
-        if winlen>dftlen: raise ValueError('winlen({})>dftlen({})'.format(winlen, dftlen)) # pragma: no cover
+        #      than winnbper-1 periods (dangerous with high pitched and tense voice).
+        if winlen>dftlen: raise ValueError('The window length ({}) is bigger than the DFT length ({}). Please, increase the dftlen of your spectral features or check if the f0 curve has extremly low values and try to clip them to higher values (at least higher than 50[Hz])'.format(winlen, dftlen)) # pragma: no cover
 
         # Set the rough position of the pulse in the window (the closest sample)
         # We keep a third of the window (1 period) on the left because the
         # pulse signal is minimum phase. And 2/3rd (remaining 2 periods)
         # on the right to let the VTF decay.
-        pulseposinwin = int((1.0/nbper)*winlen)
+        pulseposinwin = int((1.0/winnbper)*winlen)
 
         # The sample indices of the current pulse wrt. the final waveform
         winidx = int(round(fs*t)) + np.arange(winlen)-pulseposinwin
