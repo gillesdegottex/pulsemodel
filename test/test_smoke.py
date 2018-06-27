@@ -10,12 +10,13 @@ import numpy as np
 np.random.seed(123)
 
 filenames = ['slt_arctic_a0010.wav', 'bdl_arctic_a0020.wav', 'clb_arctic_a0030.wav', 'awb_arctic_a0040.wav']
+filename_totest = 0
 
 class TestSmoke(unittest.TestCase):
 
     @classmethod
     def test_smoke_cmd_analysis(cls):
-        fname = filenames[0] # Just with one file for smoke test
+        fname = filenames[filename_totest] # Just with one file for smoke test
 
         import analysis
         analysis.main(['test/'+fname])
@@ -49,7 +50,7 @@ class TestSmoke(unittest.TestCase):
 
     @classmethod
     def test_smoke_cmd_synthesis(cls):
-        fname = filenames[0] # Just with one file for smoke test
+        fname = filenames[filename_totest] # Just with one file for smoke test
 
         import synthesis
 
@@ -74,7 +75,7 @@ class TestSmoke(unittest.TestCase):
 
     @classmethod
     def test_smoke_analysis_synthesis(cls):
-        fname = filenames[0] # Just with one file for smoke test
+        fname = filenames[filename_totest] # Just with one file for smoke test
 
         f0_min = 75
         f0_max = 800
