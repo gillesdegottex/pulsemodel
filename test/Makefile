@@ -35,4 +35,4 @@ clean:
 	rm -f *.resynth.wav *.f0 *.lf0 *.logf0 *.spec *.fwspec *.fwcep *.pdd *.mpdd *.nm *.bndnm *.fwnm *.diff
 
 distclean:
-	rm -f samples.scp *.wav *.f0 *.lf0 *.logf0 *.spec *.fwspec *.fwcep *.pdd *.mpdd *.nm *.bndnm *.fwnm *.diff
+	rm -f samples.scp *.wav *.f0 *.lf0 *.f0txt *.logf0 *.spec* *.fwspec *.fwlspec *.fwcep *.pdd *.mpdd *.nm *.bndnm *.fwnm *.diff
