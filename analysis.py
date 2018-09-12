@@ -280,6 +280,7 @@ def analysisf(fwav,
         spec_mceporder=None, # Mel-cepstral order for compressing the spectrogram (typically 59; None: no compression)
         spec_fwceporder=None,# Frequency warped cepstral order (very similar to above, just faster and less precise) (typically 59; None: no compression)
         spec_nbfwbnds=None,  # Number of mel-bands in the compressed half log spectrogram (None: no compression)
+        spec_nblinlogbnds=None,  # Number of linear-bands in the compressed half log spectrogram (None: no compression)
         fpdd=None, pdd_mceporder=None,   # Mel-cepstral order for compressing PDD spectrogram (typically 59; None: no compression)
         fnm=None, nm_nbfwbnds=None,  # Number of mel-bands in the compressed noise mask (None: no compression)
         preproc_fs=None, # Resample the waveform
@@ -330,6 +331,8 @@ def analysisf(fwav,
             SPEC = sp.loghspec2fwcep(np.log(abs(SPEC)), fs, order=spec_fwceporder)
         if not spec_nbfwbnds is None:
             SPEC = sp.linbnd2fwbnd(np.log(abs(SPEC)), fs, dftlen, spec_nbfwbnds)
+        if not spec_nblinlogbnds is None:
+            SPEC = np.log(abs(SPEC))
         if verbose>0: print('    Output Spectrogram size={} in: {}'.format(SPEC.shape, fspec))
         if os.path.dirname(fspec)!='' and (not os.path.isdir(os.path.dirname(fspec))): os.mkdir(os.path.dirname(fspec))
         SPEC.astype(np.float32).tofile(fspec)
@@ -380,6 +383,7 @@ def main(argv):
     argpar.add_argument("--spec_mceporder", default=None, type=int, help="Mel-cepstral order for the spectrogram (None:uncompressed; typically 59)")
     argpar.add_argument("--spec_fwceporder", default=None, type=int, help="Frequency warped cepstral order (very similar to above, just faster and less precise) (typically 59)")
     argpar.add_argument("--spec_nbfwbnds", default=None, type=int, help="Number of mel-bands in the compressed half log spectrogram (None:uncompressed; typically 129 (should be odd size as long as full spectrum size if power of 2 (even size)")
+    argpar.add_argument("--spec_nblinlogbnds", default=None, type=int, help="Number of frequency bands in the compressed half log spectrogram (None:uncompressed; typically 129 (should be odd size as long as full spectrum size if power of 2 (even size)")
     argpar.add_argument("--pdd", default=None, help="Output Phase Distortion Deviation (PDD) file")
     argpar.add_argument("--pdd_mceporder", default=None, type=int, help="Cepstral order for PDD (None:uncompressed; typically 59)")
     argpar.add_argument("--nm", default=None, help="Output noise mask (for PML vocoder)")
@@ -394,7 +398,7 @@ def main(argv):
               dftlen=args.dftlen,
               finf0txt=args.inf0txt, f0_min=args.f0_min, f0_max=args.f0_max, ff0=args.f0, f0_log=args.f0_log,
               finf0bin=args.inf0bin,
-              fspec=args.spec, spec_mceporder=args.spec_mceporder, spec_fwceporder=args.spec_fwceporder, spec_nbfwbnds=args.spec_nbfwbnds,
+              fspec=args.spec, spec_mceporder=args.spec_mceporder, spec_fwceporder=args.spec_fwceporder, spec_nbfwbnds=args.spec_nbfwbnds, spec_nblinlogbnds=args.spec_nblinlogbnds,
               fpdd=args.pdd, pdd_mceporder=args.pdd_mceporder,
               fnm=args.nm, nm_nbfwbnds=args.nm_nbfwbnds,
               preproc_fs=args.preproc_fs, preproc_hp=args.preproc_hp,

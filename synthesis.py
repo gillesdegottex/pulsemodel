@@ -79,7 +79,6 @@ def synthesize(fs, f0s, SPEC, NM=None, wavlen=None
     if not NM is None: NM = NM.copy()
     else:              NM = np.zeros(SPEC.shape)
 
-
     # Check the size of the inputs
     if f0s.shape[0]!=SPEC.shape[0]:
         raise ValueError('F0 size {} and spectrogram size {} do not match'.format(f0s.shape[0], SPEC.shape[0])) # pragma: no cover
@@ -291,7 +290,7 @@ def synthesize(fs, f0s, SPEC, NM=None, wavlen=None
 
 
 
-def synthesizef(fs, shift=0.005, dftlen=4096, ff0=None, flf0=None, fspec=None, ffwlspec=None, ffwcep=None, fmcep=None, fpdd=None, fmpdd=None, fnm=None, ffwnm=None, nm_cont=False, fsyn=None, verbose=1):
+def synthesizef(fs, shift=0.005, dftlen=4096, ff0=None, flf0=None, fspec=None, flspec=None, ffwlspec=None, ffwcep=None, fmcep=None, fpdd=None, fmpdd=None, fnm=None, ffwnm=None, nm_cont=False, fsyn=None, verbose=1):
     '''
     Call the synthesis from python using file inputs and outputs
     '''
@@ -306,6 +305,9 @@ def synthesizef(fs, shift=0.005, dftlen=4096, ff0=None, flf0=None, fspec=None, f
     if fspec:
         SPEC = np.fromfile(fspec, dtype=np.float32)
         SPEC = SPEC.reshape((len(f0), -1))
+    if flspec:
+        SPEC = np.fromfile(fspec, dtype=np.float32)
+        SPEC = np.exp(SPEC.reshape((len(f0), -1)))
     if ffwlspec:
         FWLSPEC = np.fromfile(ffwlspec, dtype=np.float32)
         FWLSPEC = FWLSPEC.reshape((len(f0), -1))
@@ -362,6 +364,7 @@ def main(argv):
     argpar.add_argument("--f0", default=None, help="Input f0[Hz] file")
     argpar.add_argument("--logf0", default=None, help="Input f0[log Hz] file")
     argpar.add_argument("--spec", default=None, help="Input amplitude spectrogram [linear values]")
+    argpar.add_argument("--lspec", default=None, help="Input amplitude spectrogram [log spectral values on linear frequency scale]")
     argpar.add_argument("--fwlspec", default=None, help="Input amplitude spectrogram [frequency warped log spectral values]")
     argpar.add_argument("--fwcep", default=None, help="Input amplitude spectrogram [frequency warped cepstrum values]")
     argpar.add_argument("--mcep", default=None, help="Input amplitude spectrogram [mel-cepstrum values]")
