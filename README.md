@@ -20,7 +20,7 @@ In the root directory, simply run:
 $ make test
 ```
 
-You can also have a look at the file test/Makefile to see how the PML's scripts can be used.
+You can also have a look at the file test/test_smoke.py to see how the PML's scripts can be used.
 
 ### Legal
 
