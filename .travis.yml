@@ -30,6 +30,7 @@ before_install:
     - sudo apt-get install -y cython
     - sudo apt-get install -y python-numpy
     - sudo apt-get install -y python-scipy
+    - sudo apt-get install -y sox
 
 install:
     - echo "install..."
