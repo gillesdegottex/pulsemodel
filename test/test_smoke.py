@@ -21,6 +21,7 @@ class TestSmoke(unittest.TestCase):
         import analysis
         analysis.main(['test/'+fname])
         analysis.main(['test/'+fname, '--f0', 'test/'+fname.replace('.wav','.f0')])
+        analysis.main(['test/'+fname, '--f0', 'test/'+fname.replace('.wav','.f0'), '--preproc_fs', '8000'])
         analysis.main(['test/'+fname, '--f0_min', '75', '--f0', 'test/'+fname.replace('.wav','.f0')])
         analysis.main(['test/'+fname, '--f0_max', '200', '--f0', 'test/'+fname.replace('.wav','.f0')])
         analysis.main(['test/'+fname, '--f0_min', '81', '--f0_max', '220', '--f0', 'test/'+fname.replace('.wav','.f0')])
@@ -36,6 +37,7 @@ class TestSmoke(unittest.TestCase):
         # analysis.main(['test/'+fname, ' --spec_mceporder', '59', '--spec', 'test/'+fname.replace('.wav','.mcep')]) # Need SPTK for this one
         analysis.main(['test/'+fname, '--spec_fwceporder', '59', '--spec', 'test/'+fname.replace('.wav','.fwcep')])
         analysis.main(['test/'+fname, '--spec_nbfwbnds', '65', '--spec', 'test/'+fname.replace('.wav','.fwlspec')])
+        analysis.main(['test/'+fname, '--spec_nblinlogbnds', '129', '--spec', 'test/'+fname.replace('.wav','.lspec')])
         analysis.main(['test/'+fname, '--pdd', 'test/'+fname.replace('.wav','.pdd')])
         # analysis.main(['test/'+fname, '--pdd_mceporder', '60', '--pdd', 'test/'+fname.replace('.wav','.pdd')])  # Need SPTK for this one
         analysis.main(['test/'+fname, '--nm', 'test/'+fname.replace('.wav','.nm')])
