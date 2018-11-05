@@ -350,7 +350,7 @@ def synthesizef(fs, shift=0.005, dftlen=4096, ff0=None, flf0=None, fspec=None, f
 
     syn = synthesize(fs, f0s, SPEC, NM=NM, nm_cont=nm_cont, verbose=verbose)
     if fsyn:
-        sp.wavwrite(fsyn, syn, fs, norm_abs=True, verbose=verbose)
+        sp.wavwrite(fsyn, syn, fs, norm_max_ifneeded=True, verbose=verbose)
 
     return syn
 
