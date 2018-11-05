@@ -306,7 +306,7 @@ def synthesizef(fs, shift=0.005, dftlen=4096, ff0=None, flf0=None, fspec=None, f
         SPEC = np.fromfile(fspec, dtype=np.float32)
         SPEC = SPEC.reshape((len(f0), -1))
     if flspec:
-        SPEC = np.fromfile(fspec, dtype=np.float32)
+        SPEC = np.fromfile(flspec, dtype=np.float32)
         SPEC = np.exp(SPEC.reshape((len(f0), -1)))
     if ffwlspec:
         FWLSPEC = np.fromfile(ffwlspec, dtype=np.float32)
@@ -380,7 +380,7 @@ def main(argv):
     args = argpar.parse_args(argv)
     args.dftlen = 4096
 
-    synthesizef(args.fs, shift=args.shift, dftlen=args.dftlen, ff0=args.f0, flf0=args.logf0, fspec=args.spec, ffwlspec=args.fwlspec, ffwcep=args.fwcep, fmcep=args.mcep, fnm=args.nm, ffwnm=args.fwnm, nm_cont=args.nm_cont, fpdd=args.pdd, fmpdd=args.mpdd, fsyn=args.synth, verbose=args.verbose)
+    synthesizef(args.fs, shift=args.shift, dftlen=args.dftlen, ff0=args.f0, flf0=args.logf0, fspec=args.spec, flspec=args.lspec, ffwlspec=args.fwlspec, ffwcep=args.fwcep, fmcep=args.mcep, fnm=args.nm, ffwnm=args.fwnm, nm_cont=args.nm_cont, fpdd=args.pdd, fmpdd=args.mpdd, fsyn=args.synth, verbose=args.verbose)
 
 if  __name__ == "__main__" :            # pragma: no cover
     main(sys.argv[1:])
