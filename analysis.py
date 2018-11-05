@@ -386,7 +386,7 @@ def main(argv):
     argpar.add_argument("--spec_nblinlogbnds", default=None, type=int, help="Number of frequency bands in the compressed half log spectrogram (None:uncompressed; typically 129 (should be odd size as long as full spectrum size if power of 2 (even size)")
     argpar.add_argument("--pdd", default=None, help="Output Phase Distortion Deviation (PDD) file")
     argpar.add_argument("--pdd_mceporder", default=None, type=int, help="Cepstral order for PDD (None:uncompressed; typically 59)")
-    argpar.add_argument("--nm", default=None, help="Output noise mask (for PML vocoder)")
+    argpar.add_argument("--nm", default=None, help="Output noise mask")
     argpar.add_argument("--nm_nbfwbnds", default=None, type=int, help="Number of mel-bands in the compressed noise mask (None:uncompressed; typically 33)")
     argpar.add_argument("--preproc_fs", default=None, type=float, help="[Hz] Resample the waveform before analysis.")
     argpar.add_argument("--preproc_hp", default=None, type=float, help="[Hz] High-pass the waveform before analysis.")
