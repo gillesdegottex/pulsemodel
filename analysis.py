@@ -187,23 +187,25 @@ def analysis_nm(wav, fs,
     dftlen = (PDD.shape[1]-1)*2 # and the DFT len from the PDD feature
 
     # The Noise Mask is just a thresholded version of PDD
-    NM = PDD.copy()
-    NM[PDD<=pdd_threshold] = 0
-    NM[PDD>pdd_threshold] = 1
+    HARM = PDD.copy()
+    HARM[PDD<=pdd_threshold] = 0
+    HARM[PDD>pdd_threshold] = 1
 
     if nm_clean:
         # Clean the PDD mask to avoid learning rubish details
         import scipy.ndimage
         frq = 70.0 # [Hz]
         morphstruct = np.ones((int(np.round((1.0/frq)/shift)),int(np.round(frq*dftlen/float(fs)))))
-        NM = 1.0-NM
-        NM = scipy.ndimage.binary_opening(NM, structure=morphstruct)
-        NM = scipy.ndimage.binary_closing(NM, structure=morphstruct)
-        NM = 1.0-NM
+        HARM = 1.0-HARM
+        HARM = scipy.ndimage.binary_opening(HARM, structure=morphstruct)
+        HARM = scipy.ndimage.binary_closing(HARM, structure=morphstruct)
+        HARM = 1.0-HARM
 
     # Avoid noise in low-freqs
     for n in range(len(f0s[:,0])):
-        NM[n,:int(np.round(1.5*f0s[n,1]*dftlen/float(fs)))] = 0.0
+        HARM[n,:int(np.round(1.5*f0s[n,1]*dftlen/float(fs)))] = 0.0
+
+    NM = HARM
 
     return NM
 
