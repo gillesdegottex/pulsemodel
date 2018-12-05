@@ -283,8 +283,8 @@ def analysisf(fwav,
         spec_fwceporder=None,# Frequency warped cepstral order (very similar to above, just faster and less precise) (typically 59; None: no compression)
         spec_nbfwbnds=None,  # Number of mel-bands in the compressed half log spectrogram (None: no compression)
         spec_nblinlogbnds=None,  # Number of linear-bands in the compressed half log spectrogram (None: no compression)
-        fpdd=None, pdd_mceporder=None,   # Mel-cepstral order for compressing PDD spectrogram (typically 59; None: no compression)
-        fnm=None, nm_nbfwbnds=None,  # Number of mel-bands in the compressed noise mask (None: no compression)
+        fpdd=None, pdd_mceporder=None, # Mel-cepstral order for compressing PDD spectrogram (typically 59; None: no compression)
+        fnm=None, nm_nbfwbnds=None,    # Number of mel-bands in the compressed noise mask (None: no compression)
         preproc_fs=None, # Resample the waveform
         preproc_hp=None, # Cut-off of high-pass filter (e.g. 20Hz)
         verbose=1):
