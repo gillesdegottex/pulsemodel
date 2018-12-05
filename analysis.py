@@ -82,9 +82,9 @@ def analysis_f0postproc(wav, fs, f0s=None, f0_min=60, f0_max=600,
     f0s = sp.f0s_rmsteps(f0s)
     # Resample the given f0 to regular intervals
     if np.std(np.diff(f0s[:,0]))>2*np.finfo(f0s[0,0]).resolution:
-        warnings.warn('''\n\nWARNING: F0 curve seems to be sampled non-uniformly.
+        warnings.warn('''\n\nWARNING: F0 curve seems to be sampled non-uniformly (mean(F0)={}, std(F0s')={}).
          It will be resampled at {}s intervals.
-        '''.format(shift), RuntimeWarning)
+        '''.format(np.std(f0s[:,0]), np.std(np.diff(f0s[:,0])), shift), RuntimeWarning)
         f0s = sp.f0s_resample_cst(f0s, shift)
 
     return f0s
