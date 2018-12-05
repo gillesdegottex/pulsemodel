@@ -79,6 +79,8 @@ def synthesize(fs, f0s, SPEC, NM=None, wavlen=None
     if not NM is None: NM = NM.copy()
     else:              NM = np.zeros(SPEC.shape)
 
+    NM = np.clip(NM, 0.0, 1.0)  # The noise mask is supposed to be in [0,1]
+
     # Check the size of the inputs
     if f0s.shape[0]!=SPEC.shape[0]:
         raise ValueError('F0 size {} and spectrogram size {} do not match'.format(f0s.shape[0], SPEC.shape[0])) # pragma: no cover
