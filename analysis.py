@@ -289,6 +289,7 @@ def analysisf(fwav,
 
     wav, fs, _ = sp.wavread(fwav)
 
+    if len(wav)==0: raise ValueError('The waveform in {} is empty.'.format(fwav))
 
     if verbose>0: print('PML Analysis (dur={:.3f}s, fs={}Hz, f0 in [{},{}]Hz, shift={}s, dftlen={})'.format(len(wav)/float(fs), fs, f0_min, f0_max, shift, dftlen))
 
